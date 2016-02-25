@@ -1,7 +1,8 @@
 # prms-fire-scenarios
 
 In keeping with our aim of serving specific hydrologists' needs while building or demonstrating core
-cyberinfrastructure (CI), we are building this tool 
+cyberinfrastructure (CI), this tool uses Virtual Watershed technology to provide a tool for
+hydrologists wanting to investigate the effects of fire on the outputs of PRMS models.
 
 # Prototype Goals and Milestones (as of 2/25)
 
