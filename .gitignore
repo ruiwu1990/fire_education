@@ -63,3 +63,4 @@ target/
 
 # bower frontend components
 app/static/bower_components
+venv
