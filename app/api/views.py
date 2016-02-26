@@ -54,7 +54,7 @@ def scenarios():
         return jsonify(
             {
                 'message':
-                'POST received! Soon you\'ll actually kick of a model!'
+                'POST received! Soon you\'ll actually kick off a model!'
             }
         )
 
@@ -64,7 +64,7 @@ ex_uu2 = '1'
 
 EXAMPLE_SCENARIOS = [{
     'name': 'Smaller fire',
-    'id': 'f45878bc-4559-4cab-8d78-a3b13f5aec60',
+    'id': ex_uu1,
     'time_received': '2016-02-25T18:22:01',
     'time_finished': '2016-02-25T18:28:01',
     'input': {
@@ -106,7 +106,7 @@ EXAMPLE_SCENARIOS = [{
 },
     {
     'name': 'Larger fire',
-    'id': 'f45878bc-4559-4cab-8d78-a3b13f5aec60',
+    'id': ex_uu2,
     'time_received': '2016-02-25T18:22:01',
     'time_finished': '2016-02-25T18:28:01',
     'input': {

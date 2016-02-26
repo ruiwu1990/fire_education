@@ -1,9 +1,12 @@
 <!-- Home page for our human adaptor -->
 {% extends "base.html" %}
 {% set active_page = "index" %}
+{% block scripts %}
+    {{ super() }}
+    <script type="text/babel" src="/static/js/scenarios.js"></script>
+{% endblock %}
 {% block link %}
     {{ super() }}
-    <link href="/static/index.css" rel="stylesheet">
 {% endblock %}
 {% block head_ext %}
     {{ super() }}
@@ -48,9 +51,8 @@
         </div>
     </div>
     <div class="row">
-        <div id="scenario-list">
             <h3 class="section-header">List of Completed Scenarios</h3>
-        </div>
+        <div id="scenario-list"></div>
     </div>
 </div>
 
@@ -65,4 +67,10 @@ function initMap() {
 </script>
 <script src="https://maps.googleapis.com/maps/api/js?callback=initMap"
         async defer></script>
+<script type="text/babel">
+ReactDOM.render(
+    <ScenarioListBox pollInterval={2000} />,
+    document.getElementById('scenario-list')
+);
+</script>
 {% endblock %}
