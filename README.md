@@ -20,6 +20,11 @@ how to build out the wireframe demo (forthcoming).
 Currently there are some demo routes in [app/api/views.py](https://github.com/VirtualWatershed/prms-fire-scenarios/blob/master/app/api/views.py)
 and the Swagger API spec is in [api-spec.yaml](https://github.com/VirtualWatershed/prms-fire-scenarios/blob/master/api-spec.yaml).
 
+After installing dependencies (see below) you can start the python server with `python manage.py runserver` then navigate to
+[localhost:5000](http://localhost:5000) and you should see the screen below:
+
+<img src="frontend_wireframe.png" alt="wireframe" width="500"/>
+
 
 #### Dependencies
 
