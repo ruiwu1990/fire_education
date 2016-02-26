@@ -1,5 +1,5 @@
 {
-  "name": "vw-data-management",
+  "name": "prms-fire-scenarios",
   "authors": [
     "Matthew Turner <maturner01@gmail.com>"
   ],
@@ -16,5 +16,10 @@
     "app/static/bower_components",
     "test",
     "tests"
-  ]
+  ],
+  "dependencies": {
+    "bootswatch-dist": "3.3.6-sandstone",
+    "react": "^0.14.7",
+    "babel": "*"
+  }
 }
