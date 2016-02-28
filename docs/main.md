@@ -1,6 +1,26 @@
-PRMS Burn Scenario Tool
-=======================
+---
+title: PRMS Vegetation Map Scenario Tool
+author:
+    - Matthew A. Turner
+    - Chao Chen
+    - Moinul Hossain
+    - Lisa Palathingal
+    - Chase Carthen
+    - John Erickson
+    - Lucas J. Sheneman
+    - Karl Benedict
+    - Fred Harris
+    - Sajjad Ahmad
+date: \today{}
+geometry: margin=1in
+header-includes:
+    - \usepackage{setspace}
+    - \doublespacing
+    - \usepackage{lineno}
+    - \linenumbers
+---
 
+\maketitle
 
 \begin{abstract}
 Climate Change brings with it increased chances of vegetation succession,
@@ -24,10 +44,14 @@ So if your hydrologists are using MATLAB you could build a MATLAB
 client, or if you want to build a mobile app, you can do that, too.
 \end{abstract}
 
+\tableofcontents
 
 
-Introduction
-------------
+\newpage
+
+
+
+# Introduction
 
 First it's important to note that this PRMS Burn Scenario Tool (PBST)
 is a product of the [Virtual Watershed
@@ -60,8 +84,19 @@ this to other technologies like CAVEs and immersive technologies.
 
 
 
-Design and Software
--------------------
+# Design and Software
+
+This section introduces our software stack, with Python providing a REST API
+that serves and accepts JSON on the backend and a ReactJS, Bootstrap, and
+
+This is a fully open source solution with familiar, ubiquitous tools that all
+students will find valuable to know as they enter the workforce. By using
+common and cutting-edge tools we make our developers lives easier since more
+resources are available online for learning the tools, and the power and wide
+applicability of these tools makes development fun.
+
+
+## Server Architecture: REST, JSON, Python
 
 The REST architecture is the natural choice for Service Oriented
 Architectures (SOA) where providers and consumers are loosely coupled to
@@ -69,16 +104,38 @@ allow for services to be improved or new services to be added without
 affecting other services. By using the REST-compliant SOA, clients can
 expect the only verbs to be the HTTP verbs, and URLs will be
 descriptive, intuitive nouns, best explained in Fielding's PhD thesis
-where he introduces his invention @fielding2000.
+where he introduces his invention [@fielding2000].
 
-JSON is in and XML is out @vitolo2015web, arguably because web technologies
+JSON is in and XML is out [@vitolo2015web], arguably because web technologies
 are rarely, if ever, designed with XML in mind, and we want to support
-GeoJSON queries natively, we use MongoDB as our datastore.
+GeoJSON queries natively, we use MongoDB as our datastore. Part of the Virtual
+Watershed effort is not just to establish better cyberinfrastructure for
+hydrologists, but also to use and establish best practices for future
+cyberinfrastructure developers.
 
-NetCDF, Flask, Unity, D3, React
+To this end, we are using standards where appropriate. Appropriate means
+not only having a history of adoption within the hydrology community, but also
+having modern tools to support development. To this end, we have chosen
+netCDF as our common data format. In the case of PRMS this enables us to
+use existing tools, namely the
+[netcdf-python](https://github.com/Unidata/netcdf4-python) library, to
+modify PRMS parameter files. `netcdf4-python` uses numpy arrays, which are widely
+used across a multitude (if not all!) scientific disciplines.
+The netCDF format is self-describing, meaning it contains its own metadata in
+a standardized format. This allows us to include all the metadata of a PRMS
+file, as well as its data, in a format that any developer at any point in their
+career can find a plethora of help for using.
+
+
+## Front-end Architecture: ReactJS, D3, jQuery
+
+
+
+# Hydrologist's Workflow
+
 
 
 \newpage
 
-Works Cited
------------
+# Works Cited
+
