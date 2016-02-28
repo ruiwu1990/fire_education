@@ -7,4 +7,5 @@ opdf: pdf
 	open main.pdf
 
 pdf:
-	pandoc main.md -o main.pdf
+	pandoc -s -S --bibliography vwbib.bib --filter pandoc-citeproc \
+		main.md -o main.pdf

@@ -3,12 +3,12 @@ PRMS Burn Scenario Tool
 
 
 \begin{abstract}
-Since burn extent has an impact on the hydrodynamics of a watershed,
-it's important to be able to readily modify the vegetation type in the
-burn to indicate it has burned as well as quickly run PRMS after we
-have updated the area of burn. In order to plan for multiple scenarios
-in high burn-risk areas, we present an online tool that allows a user
-to create burn area GeoJSON MultiPolygons on a map either in the
+Climate Change brings with it increased chances of vegetation succession,
+be it due to fire, drought, temperature and precipitation change, or flooding.
+PRMS is a popular tool for hydrological modeling. Combining the two,
+we present an online tool that allows a user
+to model vegetation succession in a variety of scenarios and analyze the PRMS
+output. To do this, a user draws GeoJSON MultiPolygons on a map either in the
 browser or in a Unity visualization client, then re-run PRMS for all
 of the scenarios they have created. The user then can download the
 outputs in convenient netCDF format for local processing. Although
@@ -76,3 +76,9 @@ are rarely, if ever, designed with XML in mind, and we want to support
 GeoJSON queries natively, we use MongoDB as our datastore.
 
 NetCDF, Flask, Unity, D3, React
+
+
+\newpage
+
+Works Cited
+-----------
