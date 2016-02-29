@@ -3,9 +3,9 @@ title: PRMS Vegetation Map Scenario Tool
 author:
     - Matthew A. Turner
     - Chao Chen
+    - Chase Carthen
     - Moinul Hossain
     - Lisa Palathingal
-    - Chase Carthen
     - John Erickson
     - Lucas J. Sheneman
     - Karl Benedict
@@ -83,6 +83,106 @@ using the Unity gaming engine. The Unity engine allows us to connect
 this to other technologies like CAVEs and immersive technologies.
 
 
+# Hydrologist Workflow
+
+`(from Chao)`
+
+As one of the most important inputs to a hydrologic model, the land cover
+(cov_type) determines the hydrological processes of canopy interception,
+evapotranspiration and snow pack accumulation/melt, and through the changes of
+these processes, the water formation and distribution as to streamflow rate and
+timing on entire watershed will be affected or changed entirely. By
+simulating the changes of vegetation type, the impact of vegetation
+distribution on hydrologic processes can be assessed. Making the functionality
+of vegetation change available in Vis tool/VW platform will help researchers to
+perform theoretical studies with a change of vegetation distribution and
+evaluate the hydrological changes.
+
+## More on the science with references to previous work (Chao)
+
+As one of the most important inputs to a hydrologic model, the land cover
+(cov_type) determines the hydrological processes of canopy interception,
+evapotranspiration and snow pack accumulation/melt, and through the changes
+of these processes, the water formation and distribution as to streamflow
+rate and timing on entire watershed will be affected or changed entirely.
+By simulating the changes of vegetation type, the impact of vegetation
+distribution on hydrologic processes can be assessed. Making the
+functionality of vegetation change available in Vis tool/VW platform
+can help researchers to perform theoretical study with a change of vegetation
+distribution and evaluate the hydrological changes.
+
+The seven parameters to be updated when vegetation type (cov_type) is updated:
+
+1. snow interception storage capacity for the major vegetation type in each HRU (snow_intcp)
+1. summer rain interception storage capacity for the major vegetation type in each HRU (srain_intcp)
+1. winter rain interception storage for the major vegetation type in each HRU (wrain_intcp)
+1. summer vegetation cover density for the major vegetation type in each HRU(covden_sum)
+1. winter vegetation cover density for the major vegetation type in each HRU(covden_win), from the Canopy Interception process
+1. Air temperature coefficient (jh_coef_hru) used in Jensen-Haise potential evapotranspiration equation for each HRU (jh_coef_hru), from the Potential Evapotranspiration process
+1. Transmission coefficient for short-wave radiation through winter plant canopy (rad_trncf), from the Snow Computation process
+
+When vegetation change occurs to a certain region in Lehman Creek, we will
+replace these 7 parameter values with the corresponding values of the
+certain vegetation type that the region changes into. For example, if we
+make the vegetation type change from 3 (forest) to 0 (barren), we will use
+the 7 parameter values from other barren area within the watershed, to
+replace those 7 parameter values in this vegetation changed region.
+Certainly, there are limitations and assumptions we have to make for this
+method employment and for the vegetation change study too.
+
+
+## REST API for running scenarios
+
+REST is a ubiquitous and powerful scheme for programming language-agnostic
+functionality. In our case, our server has been
+designed to present the user with an interface for running new scenarios and
+a list of previously run scenarios.
+
+A new scenario consists of a list of polygons and the vegetation code associated
+with each polygon. For example, leaving out any user or session information,
+we might update two areas of our watershed with vegetation codes of 1 and 3
+over two separate polygons like so
+
+```json
+{
+	'vegetation_updates': [
+		{
+			'cov_type_code': 1,
+			'region': {
+				'type': 'Polygon',
+				'coordinates': [ [100.0, 0.0],
+								 [101.0, 0.0],
+								 [101.0, 1.0],
+								 [100.0, 1.0],
+								 [100.0, 0.0] ]
+			}
+		},
+		{
+			'cov_type_code': 3,
+			'region': { 'type': 'Polygon', 'coordinates': ... }
+		}, ...
+	],
+    ...
+}
+```
+
+If two polygons overlap, the later one in the list will overwrite previous
+polygons.
+
+
+## Translated to a Unity client (Chase)
+
+## Translated to a Web Browser (Matt)
+
+In the browser we translate the requirements of the ability to change the
+vegetation type to one of the five types for an arbitrary polygon and re-run
+the PRMS model to a set of five selector buttons and a map with a polygon
+drawing ability. The user creates one polygon at a time with the ability to
+edit existing polygons. When the user has created all the polygons necessary,
+the user presses "Run Scenario." This sends an HTTP POST request to the
+server's `/api/scenarios` route, which is explained above.
+
+
 
 # Design and Software
 
@@ -126,16 +226,18 @@ a standardized format. This allows us to include all the metadata of a PRMS
 file, as well as its data, in a format that any developer at any point in their
 career can find a plethora of help for using.
 
-
-## Front-end Architecture: ReactJS, D3, jQuery
-
+## Unity Visualization Engine (Chase)
 
 
-# Hydrologist's Workflow
+
+## Web Front-end Architecture: ReactJS, D3, jQuery
 
 
+# Discussion & Future Work
+
+
+# Conclusion
 
 \newpage
 
 # Works Cited
-
