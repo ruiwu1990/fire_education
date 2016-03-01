@@ -21,4 +21,7 @@ def create_app(config_name):
     from .api import api as api_blueprint
     app.register_blueprint(api_blueprint)
 
+    from .visualize import visualize as visualize_blueprint
+    app.register_blueprint(visualize_blueprint)
+
     return app

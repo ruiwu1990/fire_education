@@ -1,0 +1,54 @@
+<!-- Home page for our human adaptor -->
+{% extends "base.html" %}
+{% set active_page = "index" %}
+{% block scripts %}
+    {{ super() }}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <script type="text/javascript" src="/static/js/draw_polygon_on_map.js"></script>
+    
+
+{% endblock %}
+{% block link %}
+    {{ super() }}
+{% endblock %}
+{% block head_ext %}
+    {{ super() }}
+
+{% endblock %}
+
+{% block content %}
+<div class=indexainer">
+    <div class="row">
+
+        
+        <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12" >
+          <canvas class='mapCanvas' id="myCanvas" style="border:1px solid #c3c3c3;" >
+            Your browser does not support the HTML5 canvas tag.
+          </canvas>
+        </div>
+
+        <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12" >
+          <div id='buttonDiv'>
+            <input type="button" id="resetCanvasButton" value="Reset Polygon" />
+            <input type="button" id="changeMapButton" value="Submit Change to the Map" />
+            <input type="button" onclick="submitChangetoServer()" value="Submit Change to the Server" />
+          </div>
+          <div id='selectboxDiv'>
+            <select id='selectbox'>
+              <option value=0>bare ground</option>
+              <option value=1>grasses</option>
+              <option value=2>shrubs</option>
+              <option value=3>trees</option>
+              <option value=4>conifers</option>
+            </select>
+          </div>
+        </div>
+            
+    
+    </div>
+
+</div>
+
+
+
+{% endblock %}
