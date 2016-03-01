@@ -64,4 +64,9 @@ target/
 # bower frontend components
 app/static/bower_components
 venv
-*.pdf
+
+docs/main.pdf
+docs/main.aux
+docs/main.out
+docs/main.tex
+*.toc
