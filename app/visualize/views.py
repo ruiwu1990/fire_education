@@ -1,5 +1,5 @@
 """Metadata server help page views"""
-from flask import render_template, request
+from flask import render_template, request, jsonify
 
 # lisa part lib
 from netCDF4 import Dataset
@@ -107,9 +107,9 @@ def add_values_into_json():
                 'cellsize(m)': 100 \
               } \
             }
-
+            #   
     #temporaryFileHandle.write(dumps(data, temporaryFileHandle, sort_keys = True, indent=1))
-    return json.dumps(data)
+    return jsonify(data)
 
 
 @visualize.route('/visualize/veg_json', methods=['GET','POST'])
@@ -120,6 +120,9 @@ def hru_veg_json():
         # enable to choose different nc file
         return add_values_into_json()
     else:
-    	"""Lisa please add your modifying netcdf file based on part here"""
-    	# modify nectcdf file here
-    	return
+        """Lisa please add your modifying netcdf file based on part here"""
+        #data = request.json['projection_information'];
+        data = request.json['vegetation_map']['0']
+        print 'aaaaaaaaaaaaaaaaaaaaaaaaaaa'
+        print data
+        return

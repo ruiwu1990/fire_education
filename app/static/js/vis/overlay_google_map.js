@@ -1,10 +1,12 @@
-$(document).ready(function(){ 
+function overlayCanvasonGoogleMap(xllcorner,xurcorner,yllcorner,yurcorner)
+{
   // url for overlay image
   var imgURL;
   // TODO
   // need to grab this value from json
-  var rectLatLngStart = new google.maps.LatLng(43.732738, -116.14286);
-  var rectLatLngEnd = new google.maps.LatLng(43.729389, -116.13766);
+  //var rectLatLngStart = new google.maps.LatLng(xllcorner, yurcorner);
+  var rectLatLngStart = new google.maps.LatLng(39.028019, -114.21300990625019);
+  var rectLatLngEnd = new google.maps.LatLng(xurcorner, yllcorner);
   var map;
   var imageBounds;
   var imgOverlay;
@@ -19,10 +21,10 @@ $(document).ready(function(){
     //     rectLatLngEnd);
     imageBounds = {
       // north is bigger than south, east is bigger than west
-      north: 43.732738,
-      south: 43.729389,
-      east: -116.13766,
-      west: -116.14286
+      north: -114.21300990625019,
+      south: -114.323106,
+      east: 39.028019,
+      west: 38.983181122448883
     };
 
 
@@ -59,5 +61,8 @@ $(document).ready(function(){
       }); 
   }
 
+}
 
-});
+
+
+
