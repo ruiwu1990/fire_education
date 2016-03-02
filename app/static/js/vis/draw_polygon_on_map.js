@@ -2,9 +2,10 @@ $(document).ready(function(){
   // TODO this part should be done byusing get request
   // get the color from get request from the server
   var vegOrigin =[];
-/*  $.get('/visualize/veg_json', function(data){
+  $.get('/visualize/veg_json', function(data){
     vegOrigin = data;
-  });*/
+    var a = 0;
+  });
 
   // temp!!!!!!!!!!!!!!!!!1
   // use this temp_veg_json['vegetation_map']['0']['HRU_number'][0]
