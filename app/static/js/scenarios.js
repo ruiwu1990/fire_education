@@ -112,9 +112,24 @@ window.ScenarioListBox = ScenarioListBox;
     Handle Form Submit; React would be overkill, but I do want to prevent
     page reloads for better UX.
 **/
-//$('form').submit(function(e) {
-    //e.preventDefault();
+var vegChangeIdx = 0;
 
+$('#save-veg-update').click(function(e) {
+    e.preventDefault();
+
+    $('#veg-update-list')
+        .append('<h4 id="veg-change-' + vegChangeIdx + '">'
+                    + 'Yeah added a change to the veg map' +
+                        '  <a class="remove-veg-update">x</a>' +
+                '</h4>'
+        );
+
+    vegChangeIdx++;
+});
+
+$('#veg-update-list').on('click', 'a.remove-veg-update', function(e) {
+    $(e.toElement.parentElement).remove();
+});
     ////console.log($('form').serializeJSON());
 
     //var formData = new FormData();

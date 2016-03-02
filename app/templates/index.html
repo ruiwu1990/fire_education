@@ -11,110 +11,128 @@
 {% block head_ext %}
     {{ super() }}
     <style>
-      #map {
+    #map {
         width: 90%;
         height: 350px;
         margin: 20px auto;
-      }
-      #new-scenario-menu-content {
+    }
+    #new-scenario-menu-content {
         position: relative;
-      }
-      #scenario-list {
-          display: table;
-      }
-      .section-header {
+    }
+    #scenario-list {
+        display: table;
+    }
+    .section-header {
         text-decoration: underline;
-      }
-      .btn-custom {
+    }
+    .btn-custom {
         border-color: #dfd7ca;
         border-width: 2px;
         border-style: solid;
-      }
-      .btn-custom.active {
+    }
+    .btn-custom.active {
         background-color: #f8f5f0;
-      }
-      .btn-custom:hover {
+    }
+    .btn-custom:hover {
         background-color: #f8f5f0;
         color: #3e3f3a;
-      }
-      #vegetation-type-selector {
+    }
+    #vegetation-type-selector {
         margin: 15px;
-      }
-      label {
+    }
+    label {
         display: block;
-      }
+    }
+    a.remove-veg-update:hover {
+        cursor: pointer;
+    }
     </style>
 {% endblock %}
 
 {% block content %}
 <div class="container">
+
+
     <div class="row">
         <h2>Instructions</h2>
         <p>
             This tool allows you to run various PRMS scenarios for 
             vegetation states. First, select the grid cells you want to change
             to another vegetation type. Then, select which vegetation type you
-            wish to add 
+            wish to apply to the map. 
         </p>
     </div>
+
+
     <div class="row">
         <h3 class="section-header">Create a New Scenario</h3>
         <h4>1. Select Vegetation Type</h4>
         <div id="vegetation-type-selector" 
              class="btn-group" data-toggle="buttons"> 
             <label class="btn btn-custom active" for="">
-                <input id="bareground0" type="radio" 
+                <input id="bareground0" type="radio" value="0"
                        name="vegcode-select" autocomplete="off">
                 0 - Bare Ground
             </label>
             <label class="btn btn-custom">
-                <input id="grasses1" type="radio" 
+                <input id="grasses1" type="radio" value="1"
                        name="vegcode-select" autocomplete="off">
                 1 - Grasses
             </label>
             <label class="btn btn-custom">
-                <input id="shrubs2" type="radio" 
+                <input id="shrubs2" type="radio" value="2"
                        name="vegcode-select" autocomplete="off">
                 2 - Shrubs
             </label>
             <label class="btn btn-custom">
-                <input id="trees3" type="radio" 
+                <input id="trees3" type="radio" value="3"
                        name="vegcode-select" autocomplete="off">
                 3 - Trees
             </label>
             <label class="btn btn-custom">
-                <input id="conifers4" type="radio" 
+                <input id="conifers4" type="radio" value="4"
                        name="vegcode-select" autocomplete="off">
                 4 - Conifers
             </label>
         </div>
     </div>
+
+
     <div class="row">
         <h4>2. Select HRU on map for the selected vegetation type</h4>
         <div id="map"></div>
     </div>
-    <h4>3. Enter a scenario name</h4>
+
+
+    <h4>3. Save the vegetation updates</h4> 
+    <h5>(Repeat 1-4 to add more vegetation updates)</h5>
+    <div id="new-scenario-top" align="center"
+         class="row">
+
+        <button class="btn btn-default" id="save-veg-update" style="width: 70%">
+            Save Vegetation Update
+        </button>
+
+        <div id="veg-update-list"></div>
+    </div>
+
+
+    <h4>4. Enter a scenario name</h4>
     <div class="row" 
             id="new-scenario-menu" align="center">
         <div style="width:70%" align="left">
             <label for="scenario-name">Scenario Name</label>
             <div align="center">
                 <input type="text" name="scenario-name" 
-                        style="width:100%; margin-bottom: 15px;"
+                       style="width:100%; margin-bottom: 15px;"
                        id="scenario-name-input"
-                       placeholder="Use a descriptive name, e.g., Flood Event, Severe Drought, etc." />
+                       placeholder="Use a descriptive name, e.g., Flood Event, Severe Drought, etc." 
+                       required />
             </div>
         </div>
     </div>
 
-    <h4>4. Save the vegetation updates</h4> 
-    <h5>(Repeat 1-4 to add more vegetation updates)</h5>
-    <div id="new-scenario-top" align="center"
-         class="row">
-        <button class="btn btn-default" style="width: 70%">
-            Save Vegetation Update
-        </button>
-    </div>
+
     <h4>5. Run the scenario</h4>
     <h5>The result will show in the list below when it's finished</h5>
     <div class="row" align="center">
@@ -122,11 +140,17 @@
             Run Scenario
         </button>
     </div>
+
     <div class="row">
         <h3 class="section-header">List of Completed Scenarios</h3>
         <div id="scenario-list"></div>
     </div>
+
+
 </div>
+
+<!--End of Form-->
+
 
 <script>
 function initMap() {
