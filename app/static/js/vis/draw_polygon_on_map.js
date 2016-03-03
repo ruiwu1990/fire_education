@@ -33,7 +33,7 @@ $(document).ready(function(){
   // this var record all the chosen HRU num
   var chosenHRU = [];
 
-  $.get('/visualize/veg_json', function(data){
+  $.get('/api/base-veg-map', function(data){
     inputJson = data;
 
     // grab col and row num
@@ -104,7 +104,7 @@ $(document).ready(function(){
       //var jsonStr = JSON.stringify(inputJson);
       $.ajax({
           type : "POST",
-          url : "/visualize/veg_json",
+          url : "/api/base-veg-map",
           data: JSON.stringify(inputJson, null, '\t'),
           contentType: 'application/json;charset=UTF-8',
           success: function(result) {

@@ -3,8 +3,16 @@ PRMS Fire Modeling API
 
 Date: Feb 25 2016
 """
-from flask import jsonify, request, Response
+from flask import jsonify, request, Response, render_template
 import json
+
+from netCDF4 import Dataset
+from json import dumps
+from pprint import pprint
+import json
+import netCDF4    
+import numpy  
+import os
 
 from . import api
 
@@ -146,3 +154,105 @@ EXAMPLE_SCENARIOS = [{
         '2015-12-31': 80.4
     }
 }]
+
+
+def add_values_into_json():
+
+    # find path
+    app_root = os.path.dirname(os.path.abspath(__file__))
+    download_dir = app_root + '/../static/data/'
+    file_full_path = download_dir + 'parameter.nc'
+
+    fileHandle = Dataset(file_full_path, 'r')
+    #temporaryFileHandle = open('vegetation_type.json', 'w')
+        
+    dimensions = [dimension for dimension in fileHandle.dimensions]
+
+    for dimension in dimensions: 
+        if dimension == 'lat':
+            numberOfLatitudeValues = len(fileHandle.dimensions[dimension])
+        if dimension == 'lon':
+            numberOfLongitudeValues = len(fileHandle.dimensions[dimension])
+
+    latitudeValues = fileHandle.variables['lat'][:]
+    longitudeValues = fileHandle.variables['lon'][:]
+    lower_left_latitude =latitudeValues[numberOfLatitudeValues-1]
+    lower_left_longitude =longitudeValues[0]
+    upper_right_latitude =latitudeValues[0]
+    upper_right_longitude =longitudeValues[numberOfLongitudeValues-1]
+
+    variables = [variable for variable in fileHandle.variables]
+    variableValues = fileHandle.variables['cov_type'][:,:]
+    listOfVariableValues = []
+
+    for i in range(numberOfLatitudeValues):
+        for j in range(len(variableValues[i])):
+            listOfVariableValues.append(int(variableValues[i][j]))
+
+    #print listOfVariableValues
+
+    indexOfZeroValues = []
+    indexOfOneValues = []
+    indexOfTwoValues = []
+    indexOfThreeValues = []
+    indexOfFourValues = []
+
+    for index in [index for index, value in enumerate(listOfVariableValues) if value == 0]:
+        indexOfZeroValues.append(index)
+    for index in [index for index, value in enumerate(listOfVariableValues) if value == 1]:
+        indexOfOneValues.append(index)
+    for index in [index for index, value in enumerate(listOfVariableValues) if value == 2]:
+        indexOfTwoValues.append(index)
+    for index in [index for index, value in enumerate(listOfVariableValues) if value == 3]:
+        indexOfThreeValues.append(index)
+    for index in [index for index, value in enumerate(listOfVariableValues) if value == 4]:
+        indexOfFourValues.append(index)
+
+    data = { 
+              'vegetation_map': 
+              { 
+                '0': { 
+                        'HRU_number': indexOfZeroValues 
+                     }, 
+                '1': { 
+                        'HRU_number': indexOfOneValues 
+                     }, 
+                '2': { 
+                        'HRU_number': indexOfTwoValues 
+                     }, 
+                '3': { 
+                        'HRU_number': indexOfThreeValues 
+                     }, 
+                '4': { 
+                        'HRU_number': indexOfFourValues 
+                     } 
+              }, 
+              'projection_information': 
+              { 
+                'ncol': numberOfLongitudeValues, 
+                'nrow': numberOfLatitudeValues, 
+                'xllcorner': lower_left_latitude, 
+                'yllcorner': lower_left_longitude, 
+                'xurcorner': upper_right_latitude, 
+                'yurcorner' : upper_right_longitude, 
+                'cellsize(m)': 100 
+              } 
+            }
+    
+    return jsonify(data)
+
+@api.route('/visualize')
+def visualize_2d_map():
+    """visualize data on map"""
+    return render_template('vis/index.html')
+
+@api.route('/api/base-veg-map', methods=['GET','POST'])
+def hru_veg_json():
+    if request.method == 'GET':
+        """generate json file from netcdf file"""
+        # TODO this part needs to be improved
+        # enable to choose different nc file
+        return add_values_into_json()
+    else:
+        """TODO modify netcdf based on json"""
+        return
