@@ -1,36 +1,25 @@
 function overlayCanvasonGoogleMap(xllcorner,xurcorner,yllcorner,yurcorner)
 {
-  // url for overlay image
-  var imgURL;
-  // TODO
-  // need to grab this value from json
-  //var rectLatLngStart = new google.maps.LatLng(xllcorner, yurcorner);
-  var rectLatLngStart = new google.maps.LatLng(39.028019, -114.21300990625019);
-  var rectLatLngEnd = new google.maps.LatLng(xurcorner, yllcorner);
-  var map;
-  var imageBounds;
-  var imgOverlay;
+  
+  var rectLatLngCenter = new google.maps.LatLng((yurcorner+yllcorner)/2, (xurcorner+xllcorner)/2);
 
   overlayImageOnMap();
 
-  //google.maps.event.addDomListener(window, 'load', initialize);
 
   function initialize() {
-    // imageBounds = new google.maps.LatLngBounds(
-    //     rectLatLngStart,
-    //     rectLatLngEnd);
+
     imageBounds = {
       // north is bigger than south, east is bigger than west
-      north: -114.21300990625019,
-      south: -114.323106,
-      east: 39.028019,
-      west: 38.983181122448883
+      north: yurcorner,
+      south: yllcorner,
+      east: xurcorner,
+      west: xllcorner
     };
 
 
     var mapOptions = {
-      zoom: 15,
-      center: rectLatLngStart,
+      zoom: 12,
+      center: rectLatLngCenter,
       mapTypeId: google.maps.MapTypeId.SATELLITE
     };
 
@@ -52,17 +41,32 @@ function overlayCanvasonGoogleMap(xllcorner,xurcorner,yllcorner,yurcorner)
       {
         onrendered: function(canvas) {
           imgURL = canvas.toDataURL();
-           // d3.select("#test").append("img")
-           //  .attr('src',imgURL);
           google.maps.event.addDomListener(window, 'load', initialize);
-          
-          
         }
       }); 
   }
 
 }
 
+// add the overlay on google map
+function addOverlay() {  
+  imgOverlay.setMap(map);
+}
 
+// remove the overlay on google map
+function removeOverlay() {
+  imgOverlay.setMap(null);
+}
 
+function updateMapOverlay()
+{
+  imgOverlay.setMap(null);
+  // add a new overlay
+  imgURL = document.getElementById("myCanvas").toDataURL();
+
+  imgOverlay = new google.maps.GroundOverlay(
+    imgURL,
+    imageBounds);
+  imgOverlay.setMap(map);
+}
 

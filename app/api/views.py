@@ -162,12 +162,11 @@ def add_values_into_json():
     app_root = os.path.dirname(os.path.abspath(__file__))
     download_dir = app_root + '/../static/data/'
     file_full_path = download_dir + 'parameter.nc'
+    print file_full_path
 
-    fileHandle = Dataset(file_full_path, 'r')
-    #temporaryFileHandle = open('vegetation_type.json', 'w')
-        
+    fileHandle = netCDF4.Dataset(file_full_path, 'r')
+
     dimensions = [dimension for dimension in fileHandle.dimensions]
-
     for dimension in dimensions: 
         if dimension == 'lat':
             numberOfLatitudeValues = len(fileHandle.dimensions[dimension])
@@ -231,14 +230,15 @@ def add_values_into_json():
               { 
                 'ncol': numberOfLongitudeValues, 
                 'nrow': numberOfLatitudeValues, 
-                'xllcorner': lower_left_latitude, 
-                'yllcorner': lower_left_longitude, 
-                'xurcorner': upper_right_latitude, 
-                'yurcorner' : upper_right_longitude, 
+                'xllcorner': lower_left_longitude, 
+                'yllcorner': lower_left_latitude, 
+                'xurcorner': upper_right_longitude, 
+                'yurcorner' : upper_right_latitude, 
                 'cellsize(m)': 100 
               } 
             }
-    
+
+    fileHandle.close()
     return jsonify(data)
 
 @api.route('/visualize')
@@ -255,4 +255,32 @@ def hru_veg_json():
         return add_values_into_json()
     else:
         """TODO modify netcdf based on json"""
+        values = []
+
+        numberOfLongitudeValues = request.json['projection_information']['ncol']
+        numberOfLatitudeValues = request.json['projection_information']['nrow']
+        numberOfHrus = numberOfLongitudeValues * numberOfLatitudeValues
+
+        for index in range(numberOfHrus):
+            values.append(index)
+
+        for index in range(numberOfHrus):
+            if index in request.json["vegetation_map"]["0"]["HRU_number"]:
+                values[index] = 0
+            if index in request.json["vegetation_map"]["1"]["HRU_number"]:
+                values[index] = 1
+            if index in request.json["vegetation_map"]["2"]["HRU_number"]:
+                values[index] = 2
+            if index in request.json["vegetation_map"]["3"]["HRU_number"]:
+                values[index] = 3
+            if index in request.json["vegetation_map"]["4"]["HRU_number"]:
+                values[index] = 4
+
+        app_root = os.path.dirname(os.path.abspath(__file__))
+        download_dir = app_root + '/../static/data/'
+        file_full_path = download_dir + 'parameter.nc'
+        fileHandle = netCDF4.Dataset(file_full_path, mode='a')
+        fileHandle.variables['cov_type'][:,:] = values
+        fileHandle.close()
+
         return

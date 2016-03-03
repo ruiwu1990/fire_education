@@ -33,6 +33,14 @@ $(document).ready(function(){
   // this var record all the chosen HRU num
   var chosenHRU = [];
 
+  // define google map with map
+  var map;
+  // this is for image overlay
+  var imgOverlay;
+  var imageBounds;
+  // url for overlay image
+  var imgURL;
+
   $.get('/api/base-veg-map', function(data){
     inputJson = data;
 
@@ -83,6 +91,8 @@ $(document).ready(function(){
       vegCurrent = vegOrigin.slice();
       clickTime = 0;
       chosenHRU = [];
+
+      updateMapOverlay();
     });
 
     $("#changeMapButton").click(function(){
@@ -96,6 +106,9 @@ $(document).ready(function(){
       });
 
       resetCanvas(vegCurrent);
+
+      // update map overlay
+      updateMapOverlay();
     });
 
     $("#submitChangetoServerButton").click(function(){
@@ -111,10 +124,20 @@ $(document).ready(function(){
               console.log(result);
           }
       });
-      //$.post('/visualize/veg_json',jsonStr);
+      
+    });
+
+    $("#removeOverlay").click(function(){
+      removeOverlay();
+    });
+
+    $("#addOverlay").click(function(){
+      addOverlay();
     });
 
   });
+
+ 
 
   // this is used to find the length of an obj
   // this is from http://stackoverflow.com/questions/5223/length-of-a-javascript-object-that-is-associative-array
@@ -149,19 +172,6 @@ $(document).ready(function(){
         }
       }
   }
-
-  // google map part starts here
-  function initialize() {
-    var mapProp = {
-      center:new google.maps.LatLng(51.508742,-0.120850),
-      zoom:5,
-      mapTypeId:google.maps.MapTypeId.ROADMAP
-    };
-    var map=new google.maps.Map(document.getElementById("googleMapDiv"),mapProp);
-  }
-  google.maps.event.addDomListener(window, 'load', initialize);
-  // google map part ends here
-
 
 
   // this function grab data json input and create a 1D array of hru values
