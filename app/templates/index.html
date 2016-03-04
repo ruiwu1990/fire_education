@@ -8,8 +8,6 @@
     <script src="http://d3js.org/d3.v3.min.js"></script>
     <!-- THIS JS IS USED TO TAKE SCREENSHOT -->
     <script type="text/javascript" src='/static/js/vis/html2canvas.js' type='text/javascript'></script>
-    <!-- THIS JS IS USED FOR GOOGLE MAP -->
-    <script src="http://maps.googleapis.com/maps/api/js"></script>
     <!-- THIS JS IS USED FOR 2D map polygon -->
     <script type="text/javascript" src="/static/js/vis/draw_polygon_on_map.js"></script>
     <!-- THIS JS IS USED FOR 2D map overlay on Google Map -->
@@ -83,7 +81,37 @@
             </button>
         </div>
         <!--<div id="map"></div>-->
-        {% include 'includes/veg-mod-map.html' %}
+        <div id="maps" class="row">
+            
+            <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12" >
+              <canvas class='mapCanvas' id="myCanvas" style="border:1px solid #c3c3c3;" >
+                Your browser does not support the HTML5 canvas tag.
+              </canvas>
+            </div>
+
+            <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12" >
+
+              <div id='buttonDiv'>
+                <input type="button" id="resetCanvasButton" value="Reset Polygon" />
+                <input type="button" id="changeMapButton" value="Submit Change to the Map" />
+                <input type="button" id="submitChangetoServerButton" value="Submit Change to the Server" />
+              </div>
+
+              <div id='mapControl'>
+                <input type="button" id="removeOverlay" value="Remove the overlay image" />
+                <input type="button" id="addOverlay" value="add the overlay image" />
+              </div>
+            </div>
+
+            <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
+              <div id='googleMapDiv' style="width:800px;height:600px;">
+
+              </div>
+            </div>
+                
+        
+        </div>
+
     </div>
     <h4>3. Enter a scenario name</h4>
     <div class="row" 

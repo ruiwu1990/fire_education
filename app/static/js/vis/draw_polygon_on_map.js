@@ -99,7 +99,6 @@ $(document).ready(function(){
       // get the chosen color
       var colorOptNum =
           parseInt($('input[name="vegcode-select"]:checked').val());
-
       //var chosenColor = colorScale[colorOptNum];
 
       // change the veg color array based on the chosen HRU
