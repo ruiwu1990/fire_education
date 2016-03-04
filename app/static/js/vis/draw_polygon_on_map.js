@@ -97,7 +97,9 @@ $(document).ready(function(){
 
     $("#changeMapButton").click(function(){
       // get the chosen color
-      var colorOptNum = parseInt($( "#selectbox option:selected" ).val());
+      var colorOptNum =
+          parseInt($('input[name="vegcode-select"]:checked').val());
+
       //var chosenColor = colorScale[colorOptNum];
 
       // change the veg color array based on the chosen HRU
@@ -124,7 +126,7 @@ $(document).ready(function(){
               console.log(result);
           }
       });
-      
+
     });
 
     $("#removeOverlay").click(function(){
@@ -137,7 +139,7 @@ $(document).ready(function(){
 
   });
 
- 
+
 
   // this is used to find the length of an obj
   // this is from http://stackoverflow.com/questions/5223/length-of-a-javascript-object-that-is-associative-array
@@ -165,7 +167,7 @@ $(document).ready(function(){
     for(var m=0 ; m<dataY ; m++)
       {
         for(var i=0 ; i<dataX ; i++)
-        { 
+        {
           hruNum = i + m*dataX;
           vegType = vegCurrent[hruNum];
           inputJson['vegetation_map'][vegType.toString()]['HRU_number'].push(hruNum);
@@ -184,7 +186,7 @@ $(document).ready(function(){
     var tempSize;
     for(var i=0; i<Object.size(inputJson['vegetation_map']); i++)
     {
-      tempSize = inputJson['vegetation_map'][i.toString()]['HRU_number'].length; 
+      tempSize = inputJson['vegetation_map'][i.toString()]['HRU_number'].length;
       for(var m=0; m<tempSize; m++ )
       {
         outputArr[inputJson['vegetation_map'][i.toString()]['HRU_number'][m]] = i;
@@ -210,8 +212,8 @@ $(document).ready(function(){
       for(var m=0 ; m<dataY ; m++)
       {
         for(var i=0 ; i<dataX ; i++)
-        { 
-          canvas2DContext.fillStyle = colorScale[colorMatrix[i+dataX*m]];  
+        {
+          canvas2DContext.fillStyle = colorScale[colorMatrix[i+dataX*m]];
           //                          start x,     y,            width,    height
           canvas2DContext.fillRect(cellWidth*i,cellHeight*m,cellWidth,cellHeight);
           // draw lines to separate cell
@@ -292,7 +294,7 @@ $(document).ready(function(){
   {
     var startX = Math.floor(mousePosition.x/cellWidth);
     var startY = Math.floor(mousePosition.y/cellHeight);
-    canvas2DContext.fillStyle = color;  
+    canvas2DContext.fillStyle = color;
     canvas2DContext.fillRect(startX*cellWidth, startY*cellHeight, cellWidth, cellHeight);
 
     if(clickTime == 1)
@@ -324,5 +326,5 @@ $(document).ready(function(){
 
 
 
-  
-}); 
+
+});
