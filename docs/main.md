@@ -15,6 +15,7 @@ date: \today{}
 geometry: margin=1in
 header-includes:
     - \usepackage{setspace}
+    - \usepackage{minted}
     - \doublespacing
     - \usepackage{lineno}
     - \linenumbers
@@ -141,33 +142,38 @@ a list of previously run scenarios.
 A new scenario consists of a list of polygons and the vegetation code associated
 with each polygon. For example, leaving out any user or session information,
 we might update two areas of our watershed with vegetation codes of 1 and 3
-over two separate polygons like so
+over two separate subsets of HRU like so
 
-```json
+
+\begin{listing}
+\begin{minted}[linenos=true,
+               frame=single,
+               tabsize=4]{js}
 {
 	'vegetation_updates': [
 		{
 			'cov_type_code': 1,
-			'region': {
-				'type': 'Polygon',
-				'coordinates': [ [100.0, 0.0],
-								 [101.0, 0.0],
-								 [101.0, 1.0],
-								 [100.0, 1.0],
-								 [100.0, 0.0] ]
-			}
+            'hru_indices': [1, 2, 3, 5]
 		},
 		{
 			'cov_type_code': 3,
-			'region': { 'type': 'Polygon', 'coordinates': ... }
-		}, ...
-	],
-    ...
+            'hru_indices': [0, 4, 6, 7, 8]
+		}
+    ]
 }
-```
+\end{minted}
+\caption{Example request body sent to server by client}
+\label{lst:client-to-server}
+\end{listing}
 
-If two polygons overlap, the later one in the list will overwrite previous
-polygons.
+
+
+If two regions for vegetation updates overlap, the later one in the list
+will overwrite previous polygons. Note there is no reason for the client to
+transmit geospatial information---that needs to be passed only from
+server to client so the client knows how to display the data, as shown in
+Listing \ref{lst:client-to-server}.
+
 
 
 ## Translated to a Unity client (Chase)

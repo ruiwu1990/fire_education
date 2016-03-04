@@ -7,5 +7,5 @@ opdf: pdf
 	open main.pdf
 
 pdf:
-	pandoc -s -S --bibliography vwbib.bib --filter pandoc-citeproc \
-		main.md -o main.pdf
+	pandoc -s --bibliography vwbib.bib -F pandoc-citeproc main.md -o main.tex \
+		&& pdflatex -shell-escape main.tex && open main.pdf
