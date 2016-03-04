@@ -20,6 +20,7 @@
   "dependencies": {
     "bootswatch-dist": "3.3.6-sandstone",
     "react": "^0.14.7",
-    "babel": "*"
+    "babel": "*",
+    "html2canvas": "^0.4.1"
   }
 }
