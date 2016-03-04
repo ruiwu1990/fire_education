@@ -6,10 +6,6 @@ Date: Feb 25 2016
 from flask import jsonify, request, Response, render_template
 import json
 
-from netCDF4 import Dataset
-from json import dumps
-from pprint import pprint
-import json
 import netCDF4    
 import numpy  
 import os
@@ -162,74 +158,71 @@ def add_values_into_json():
     app_root = os.path.dirname(os.path.abspath(__file__))
     download_dir = app_root + '/../static/data/'
     file_full_path = download_dir + 'parameter.nc'
-    print file_full_path
+   
+    file_handle = netCDF4.Dataset(file_full_path, 'r')
 
-    fileHandle = netCDF4.Dataset(file_full_path, 'r')
-
-    dimensions = [dimension for dimension in fileHandle.dimensions]
+    dimensions = [dimension for dimension in file_handle.dimensions]
     for dimension in dimensions: 
         if dimension == 'lat':
-            numberOfLatitudeValues = len(fileHandle.dimensions[dimension])
+            number_of_latitude_values = len(file_handle.dimensions[dimension])
         if dimension == 'lon':
-            numberOfLongitudeValues = len(fileHandle.dimensions[dimension])
+            number_of_longitude_values = len(file_handle.dimensions[dimension])
 
-    latitudeValues = fileHandle.variables['lat'][:]
-    longitudeValues = fileHandle.variables['lon'][:]
-    lower_left_latitude =latitudeValues[numberOfLatitudeValues-1]
-    lower_left_longitude =longitudeValues[0]
-    upper_right_latitude =latitudeValues[0]
-    upper_right_longitude =longitudeValues[numberOfLongitudeValues-1]
+    latitude_values = file_handle.variables['lat'][:]
+    longitude_values = file_handle.variables['lon'][:]
+    lower_left_latitude = latitude_values[number_of_latitude_values-1]
+    lower_left_longitude = longitude_values[0]
+    upper_right_latitude = latitude_values[0]
+    upper_right_longitude = longitude_values[number_of_longitude_values-1]
 
-    variables = [variable for variable in fileHandle.variables]
-    variableValues = fileHandle.variables['cov_type'][:,:]
-    listOfVariableValues = []
+    variables = [variable for variable in file_handle.variables]
+    variable_values = file_handle.variables['cov_type'][:,:]
+    list_of_variable_values = []
 
-    for i in range(numberOfLatitudeValues):
-        for j in range(len(variableValues[i])):
-            listOfVariableValues.append(int(variableValues[i][j]))
+    for i in range(number_of_latitude_values):
+        for j in range(len(variable_values[i])):
+            list_of_variable_values.append(int(variable_values[i][j]))
 
-    #print listOfVariableValues
+    index_of_zero_values = []
+    index_of_one_values = []
+    index_of_two_values = []
+    index_of_three_values = []
+    index_of_four_values = []
 
-    indexOfZeroValues = []
-    indexOfOneValues = []
-    indexOfTwoValues = []
-    indexOfThreeValues = []
-    indexOfFourValues = []
-
-    for index in [index for index, value in enumerate(listOfVariableValues) if value == 0]:
-        indexOfZeroValues.append(index)
-    for index in [index for index, value in enumerate(listOfVariableValues) if value == 1]:
-        indexOfOneValues.append(index)
-    for index in [index for index, value in enumerate(listOfVariableValues) if value == 2]:
-        indexOfTwoValues.append(index)
-    for index in [index for index, value in enumerate(listOfVariableValues) if value == 3]:
-        indexOfThreeValues.append(index)
-    for index in [index for index, value in enumerate(listOfVariableValues) if value == 4]:
-        indexOfFourValues.append(index)
+    for index in [index for index, value in enumerate(list_of_variable_values) if value == 0]:
+        index_of_zero_values.append(index)
+    for index in [index for index, value in enumerate(list_of_variable_values) if value == 1]:
+        index_of_one_values.append(index)
+    for index in [index for index, value in enumerate(list_of_variable_values) if value == 2]:
+        index_of_two_values.append(index)
+    for index in [index for index, value in enumerate(list_of_variable_values) if value == 3]:
+        index_of_three_values.append(index)
+    for index in [index for index, value in enumerate(list_of_variable_values) if value == 4]:
+        index_of_four_values.append(index)
 
     data = { 
               'vegetation_map': 
               { 
                 '0': { 
-                        'HRU_number': indexOfZeroValues 
+                        'HRU_number': index_of_zero_values 
                      }, 
                 '1': { 
-                        'HRU_number': indexOfOneValues 
+                        'HRU_number': index_of_one_values 
                      }, 
                 '2': { 
-                        'HRU_number': indexOfTwoValues 
+                        'HRU_number': index_of_two_values 
                      }, 
                 '3': { 
-                        'HRU_number': indexOfThreeValues 
+                        'HRU_number': index_of_three_values 
                      }, 
                 '4': { 
-                        'HRU_number': indexOfFourValues 
+                        'HRU_number': index_of_four_values 
                      } 
               }, 
               'projection_information': 
               { 
-                'ncol': numberOfLongitudeValues, 
-                'nrow': numberOfLatitudeValues, 
+                'ncol': number_of_longitude_values, 
+                'nrow': number_of_latitude_values, 
                 'xllcorner': lower_left_longitude, 
                 'yllcorner': lower_left_latitude, 
                 'xurcorner': upper_right_longitude, 
@@ -238,7 +231,7 @@ def add_values_into_json():
               } 
             }
 
-    fileHandle.close()
+    file_handle.close()
     return jsonify(data)
 
 @api.route('/visualize')
@@ -257,14 +250,14 @@ def hru_veg_json():
         """TODO modify netcdf based on json"""
         values = []
 
-        numberOfLongitudeValues = request.json['projection_information']['ncol']
-        numberOfLatitudeValues = request.json['projection_information']['nrow']
-        numberOfHrus = numberOfLongitudeValues * numberOfLatitudeValues
+        number_of_longitude_values = request.json['projection_information']['ncol']
+        number_of_latitude_values = request.json['projection_information']['nrow']
+        number_of_hrus = number_of_longitude_values * number_of_latitude_values
 
-        for index in range(numberOfHrus):
+        for index in range(number_of_hrus):
             values.append(index)
 
-        for index in range(numberOfHrus):
+        for index in range(number_of_hrus):
             if index in request.json["vegetation_map"]["0"]["HRU_number"]:
                 values[index] = 0
             if index in request.json["vegetation_map"]["1"]["HRU_number"]:
@@ -279,8 +272,8 @@ def hru_veg_json():
         app_root = os.path.dirname(os.path.abspath(__file__))
         download_dir = app_root + '/../static/data/'
         file_full_path = download_dir + 'parameter.nc'
-        fileHandle = netCDF4.Dataset(file_full_path, mode='a')
-        fileHandle.variables['cov_type'][:,:] = values
-        fileHandle.close()
+        file_handle = netCDF4.Dataset(file_full_path, mode='a')
+        file_handle.variables['cov_type'][:,:] = values
+        file_handle.close()
 
         return
