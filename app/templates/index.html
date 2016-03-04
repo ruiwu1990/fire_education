@@ -19,70 +19,84 @@
 {% block head_ext %}
     {{ super() }}
     <style>
-      #map {
+    #map {
         width: 90%;
         height: 350px;
         margin: 20px auto;
-      }
-      #new-scenario-menu-content {
+    }
+    #new-scenario-menu-content {
         position: relative;
-      }
-      #scenario-list {
-          display: table;
-      }
-      .section-header {
+    }
+    #scenario-list {
+        display: table;
+    }
+    .section-header {
         text-decoration: underline;
-      }
-      .btn-custom {
+    }
+    .btn-custom {
         border-color: #dfd7ca;
         border-width: 2px;
         border-style: solid;
-      }
-      .btn-custom.active {
+    }
+    .btn-custom.active {
         background-color: #f8f5f0;
-      }
-      .btn-custom:hover {
+    }
+    .btn-custom:hover {
         background-color: #f8f5f0;
         color: #3e3f3a;
-      }
-      #vegetation-type-selector {
+    }
+    #vegetation-type-selector {
         margin: 15px;
-      }
-      label {
+    }
+    label {
         display: block;
-      }
+    }
+    a.remove-veg-update:hover {
+        cursor: pointer;
+    }
     </style>
 {% endblock %}
 
 {% block content %}
 <div class="container">
+
+
     <div class="row">
         <h2>Instructions</h2>
         <p>
             This tool allows you to run various PRMS scenarios for 
             vegetation states. First, select the grid cells you want to change
             to another vegetation type. Then, select which vegetation type you
-            wish to add 
+            wish to apply to the map. 
         </p>
     </div>
+
+
     <div class="row">
         <h3 class="section-header">Create a New Scenario</h3>
         <h4>1. Select Vegetation Type</h4>
         {% include 'includes/veg-type-selector.html' %}
     </div>
+
+
     <div class="row">
         <h4>2. Select HRU on map for the selected vegetation type then save to persist the change</h4>
         <h5>(Repeat 1 & 2 to add more vegetation updates)</h5>
 
+
         <div id="new-scenario-top" align="center"
              class="row">
-            <button class="btn btn-default" style="width: 70%">
-                Save Vegetation Update
+
+            <button class="btn btn-default" id="save-veg-update" style="width: 70%">
+                Modify Vegetation Region
             </button>
+
+            <div id="veg-update-list"></div>
         </div>
-        <!--<div id="map"></div>-->
+
+
         <div id="maps" class="row">
-            
+
             <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12" >
               <canvas class='mapCanvas' id="myCanvas" style="border:1px solid #c3c3c3;" >
                 Your browser does not support the HTML5 canvas tag.
@@ -93,7 +107,6 @@
 
               <div id='buttonDiv'>
                 <input type="button" id="resetCanvasButton" value="Reset Polygon" />
-                <input type="button" id="changeMapButton" value="Submit Change to the Map" />
                 <input type="button" id="submitChangetoServerButton" value="Submit Change to the Server" />
               </div>
 
@@ -108,24 +121,27 @@
 
               </div>
             </div>
-                
-        
+
         </div>
 
     </div>
-    <h4>3. Enter a scenario name</h4>
+
+
+    <h4>4. Enter a scenario name</h4>
     <div class="row" 
             id="new-scenario-menu" align="center">
         <div style="width:70%" align="left">
             <label for="scenario-name">Scenario Name</label>
             <div align="center">
                 <input type="text" name="scenario-name" 
-                        style="width:100%; margin-bottom: 15px;"
+                       style="width:100%; margin-bottom: 15px;"
                        id="scenario-name-input"
-                       placeholder="Use a descriptive name, e.g., Flood Event, Severe Drought, etc." />
+                       placeholder="Use a descriptive name, e.g., Flood Event, Severe Drought, etc." 
+                       required />
             </div>
         </div>
     </div>
+
 
     <h4>5. Run the scenario</h4>
     <h5>The result will show in the list below when it's finished</h5>
@@ -134,11 +150,17 @@
             Run Scenario
         </button>
     </div>
+
     <div class="row">
         <h3 class="section-header">List of Completed Scenarios</h3>
         <div id="scenario-list"></div>
     </div>
+
+
 </div>
+
+<!--End of Form-->
+
 
 <script>
 function initMap() {

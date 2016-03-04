@@ -95,7 +95,7 @@ $(document).ready(function(){
       updateMapOverlay();
     });
 
-    $("#changeMapButton").click(function(){
+    $("#save-veg-update").click(function(){
       // get the chosen color
       var colorOptNum =
           parseInt($('input[name="vegcode-select"]:checked').val());
