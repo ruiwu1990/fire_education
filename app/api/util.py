@@ -84,3 +84,22 @@ def add_values_into_json():
     file_handle.close()
 
     return data
+
+
+def propagate_single_vegetation_change(original_prms_params, veg_value, hrus):
+    """
+    Given a PRMS netCDF file, a PRMS vegetation code (0-4), and a list of
+    HRU indices that should be changed, update the seven other
+    vegetation-dependent parameters.
+
+    Arguments:
+        original_prms_params (netCDF4.Dataset): The original parameters file
+        veg_value (int): The vegetation value, must be 0, 1, 2, 3, or 4
+        hrus (list(int)): List of HRU indices that should get the value given
+    """
+    assert veg_value in range(5), \
+        "PRMS Vegetation Values must be an integer from 0 to 4"
+
+    mod_prms_params = netCDF4.Dataset()
+
+    return mod_prms_params
