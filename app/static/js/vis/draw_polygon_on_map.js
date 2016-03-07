@@ -161,12 +161,16 @@ $(document).ready(function(){
     //   updateMapOverlay();
     // });
 
-    $("#removeOverlay").click(function(){
+    $("#removeOverlayButton").click(function(){
       removeOverlay();
     });
 
-    $("#addOverlay").click(function(){
+    $("#addOverlayButton").click(function(){
       addOverlay();
+    });
+
+    $("#changeOpacityButton").click(function(){
+      changeOverlayOpacity();
     });
 
   });
