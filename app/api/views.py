@@ -70,41 +70,6 @@ def hru_veg_json():
         """generate json file from netcdf file"""
         return jsonify(add_values_into_json())
 
-    else:
-        """TODO modify netcdf based on json"""
-        values = []
-
-        number_of_longitude_values = \
-            request.json['projection_information']['ncol']
-        number_of_latitude_values = \
-            request.json['projection_information']['nrow']
-
-        number_of_hrus = number_of_longitude_values * number_of_latitude_values
-
-        for index in range(number_of_hrus):
-            values.append(index)
-
-        for index in range(number_of_hrus):
-            if index in request.json["vegetation_map"]["0"]["HRU_number"]:
-                values[index] = 0
-            if index in request.json["vegetation_map"]["1"]["HRU_number"]:
-                values[index] = 1
-            if index in request.json["vegetation_map"]["2"]["HRU_number"]:
-                values[index] = 2
-            if index in request.json["vegetation_map"]["3"]["HRU_number"]:
-                values[index] = 3
-            if index in request.json["vegetation_map"]["4"]["HRU_number"]:
-                values[index] = 4
-
-        app_root = os.path.dirname(os.path.abspath(__file__))
-        download_dir = app_root + '/../static/data/'
-        file_full_path = download_dir + 'parameter.nc'
-        file_handle = netCDF4.Dataset(file_full_path, mode='a')
-        file_handle.variables['cov_type'][:,:] = values
-        file_handle.close()
-
-        return jsonify(msg='implement me!')
-
 
 ex_uu1 = '0'
 ex_uu2 = '1'
