@@ -29,11 +29,13 @@ be it due to fire, drought, temperature and precipitation change, or flooding.
 PRMS is a popular tool for hydrological modeling. Combining the two,
 we present an online tool that allows a user
 to model vegetation succession in a variety of scenarios and analyze the PRMS
-output. To do this, a user draws GeoJSON MultiPolygons on a map either in the
-browser or in a Unity visualization client, then re-run PRMS for all
-of the scenarios they have created. The user then can download the
-outputs in convenient netCDF format for local processing. Although
-the app that is
+output. To do this, a user may assing vegetation to select HRU cells on a map,
+they may change all HRU cells at or above a particular elevation to a
+particular vegetation type, or change all existing HRU cells with a given
+vegetation type to a different vegetation type. Then the user can
+re-run PRMS for all of the scenarios they have created.
+The user then can download the outputs in convenient netCDF format for local processing.
+Although the app that is
 \href{https://virtualwatershed.org/modeling/prms-burn-scenarios}{available online now} is
 built exclusively for the Lehman Creek watershed located in Great
 Basin National Park in Nevada, it is suitable for any watershed for
@@ -84,7 +86,7 @@ using the Unity gaming engine. The Unity engine allows us to connect
 this to other technologies like CAVEs and immersive technologies.
 
 
-# Hydrologist Workflow
+## Science questions and user story
 
 `(from Chao)`
 
@@ -98,8 +100,6 @@ distribution on hydrologic processes can be assessed. Making the functionality
 of vegetation change available in Vis tool/VW platform will help researchers to
 perform theoretical studies with a change of vegetation distribution and
 evaluate the hydrological changes.
-
-## More on the science with references to previous work (Chao)
 
 As one of the most important inputs to a hydrologic model, the land cover
 (cov_type) determines the hydrological processes of canopy interception,
@@ -130,6 +130,22 @@ the 7 parameter values from other barren area within the watershed, to
 replace those 7 parameter values in this vegetation changed region.
 Certainly, there are limitations and assumptions we have to make for this
 method employment and for the vegetation change study too.
+
+
+# System design
+
+Our system has been designed for maximum flexibility and extensibility. By using
+a REST API to power the web front end we enable a variety of clients to be
+used. If instead we had relied on full server-side data rendering, this would be
+impossible. We do still take advantage of some server-side rendering for the
+web app, but all of the data and model-running requests are done using AJAX
+requests to the server, instead of having the server render database data
+tables and maps. By enabling Cross-Origin Resource Sharing in our Flask
+application, this API can be used by any other webpage or client
+[@mozillaCORS, @flaskCORS]. An added benefit to the API-first design of
+any application is improved separation of concerns. It practically guarantees
+the data and functions of the system will be as perpendicular as possible,
+making new development as simple and straightforward as possible.
 
 
 ## REST API for running scenarios
@@ -189,19 +205,6 @@ the user presses "Run Scenario." This sends an HTTP POST request to the
 server's `/api/scenarios` route, which is explained above.
 
 
-
-# Design and Software
-
-This section introduces our software stack, with Python providing a REST API
-that serves and accepts JSON on the backend and a ReactJS, Bootstrap, and
-
-This is a fully open source solution with familiar, ubiquitous tools that all
-students will find valuable to know as they enter the workforce. By using
-common and cutting-edge tools we make our developers lives easier since more
-resources are available online for learning the tools, and the power and wide
-applicability of these tools makes development fun.
-
-
 ## Server Architecture: REST, JSON, Python
 
 The REST architecture is the natural choice for Service Oriented
@@ -232,11 +235,20 @@ a standardized format. This allows us to include all the metadata of a PRMS
 file, as well as its data, in a format that any developer at any point in their
 career can find a plethora of help for using.
 
-## Unity Visualization Engine (Chase)
+
+# User workflow
+
+There are three ways a user may change the (vegetation) coverage type in our
+modeling tool:
+
+1. Assign a vegetation coverage type to particular HRU cells
+2. Assign a vegetation coverage type to all HRU cells at or above a given
+altitude
+3. Replace all HRU cells with a particular vegetation type to another vegetation
+type
 
 
-
-## Web Front-end Architecture: ReactJS, D3, jQuery
+##
 
 
 # Discussion & Future Work
