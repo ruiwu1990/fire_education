@@ -32,6 +32,9 @@ $(document).ready(function(){
 
   // this var record all the chosen HRU num
   var chosenHRU = [];
+  // this struct array records chosen HRU and color
+  // [{colorInfo:'#ffffff',HRUInfo:[1,2,3]},{...}]
+  var chosenAreaInfo = [];
 
   // define google map with map
   var map;
@@ -101,19 +104,20 @@ $(document).ready(function(){
       vegCurrent = vegOrigin.slice();
       clickTime = 0;
       chosenHRU = [];
+      chosenArea = [];
 
       updateMapOverlay();
     });
 
     $("#save-veg-update").click(function(){
-      // get the chosen color
-      var colorOptNum =
-          parseInt($('input[name="vegcode-select"]:checked').val());
-      //var chosenColor = colorScale[colorOptNum];
 
-      // change the veg color array based on the chosen HRU
-      $.each(chosenHRU, function(index, value) {
-        vegCurrent[value] = colorOptNum;
+      $.each(chosenAreaInfo, function(index1, value1) {
+        //var tempColor = value1.colorNum;
+        $.each(value1.chosenArea,function(index2,value2){
+
+          vegCurrent[value2] = value1.colorNum;
+
+        });
       });
 
       resetCanvas(vegCurrent);
@@ -252,8 +256,10 @@ $(document).ready(function(){
   }
 
   // this function requires top left and bot right points for the chosen area
-  function showChosenRecArea(p1,p2)
+  function showChosenRecArea(input1,input2)
   {
+    var p1 = {x:input1.x,y:input1.y};
+    var p2 = {x:input2.x,y:input2.y};
     var temp;
     canvas2DContext.fillStyle = "#FFFF00";
     // not the same point
@@ -299,23 +305,29 @@ $(document).ready(function(){
       canvas2DContext.fillRect(p1.x*cellWidth, p1.y*cellHeight, cellWidth*(p2.x-p1.x+1), cellHeight);
     }
     // push chosen HRU cell num
-    recordChosenHRU(p1,p2);
+    recordChosenAreaInfo(p1,p2);
 
   }
 
   // this function is used to add the chosen cell number into chosenHRU
   // for this function p1.x and p1.y should be =< p2.x and p2.y
   // after this function chosenHRU may have some duplicated elements
-  function recordChosenHRU(p1,p2)
+  function recordChosenAreaInfo(p1,p2)
   {
+    // get the current chosen color number
+    var colorOptNum =
+          parseInt($('input[name="vegcode-select"]:checked').val());
+
     for(var m=p1.y; m<=p2.y; m++)
     {
       for(var i=p1.x; i<=p2.x; i++)
       {
-        //                           +1 coz we need to count the overlap element
         chosenHRU.push(i+m*dataX);
       }
     }
+    
+    chosenAreaInfo.push({colorNum:colorOptNum,chosenArea:chosenHRU});
+    chosenHRU=[];
   }
 
   function changeCanvasCellColor(mousePosition,color)
