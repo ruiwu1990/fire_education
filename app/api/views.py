@@ -3,7 +3,8 @@ PRMS Fire Modeling API
 
 Date: Feb 25 2016
 """
-from flask import jsonify, request, Response, render_template
+from flask import jsonify, request, Response
+from flask_cors import cross_origin
 import json
 
 import netCDF4
@@ -63,25 +64,21 @@ def scenarios():
         )
 
 
-@api.route('/visualize')
-def visualize_2d_map():
-    """visualize data on map"""
-    return render_template('vis/index.html')
-
-
 @api.route('/api/base-veg-map', methods=['GET'])
 def hru_veg_json():
     if request.method == 'GET':
         """generate json file from netcdf file"""
-        # TODO this part needs to be improved
-        # enable to choose different nc file
         return jsonify(add_values_into_json())
+
     else:
         """TODO modify netcdf based on json"""
         values = []
 
-        number_of_longitude_values = request.json['projection_information']['ncol']
-        number_of_latitude_values = request.json['projection_information']['nrow']
+        number_of_longitude_values = \
+            request.json['projection_information']['ncol']
+        number_of_latitude_values = \
+            request.json['projection_information']['nrow']
+
         number_of_hrus = number_of_longitude_values * number_of_latitude_values
 
         for index in range(number_of_hrus):
