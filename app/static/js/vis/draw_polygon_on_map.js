@@ -69,7 +69,16 @@ $(document).ready(function(){
 
     // this is for define color for the cells
     var scaleSize = Object.size(inputJson['vegetation_map']);
-    colorScale = chroma.scale(['white','black']).colors(scaleSize);
+    colorScale = chroma.scale(['pink','black','blue','red','green']).colors(scaleSize);
+
+    // add legend for the color panel
+    for(var i=0; i<scaleSize; i++)
+    {
+      $("#colorLegendDiv").append("<p style='border-radius:25px;\
+                                  padding:20px; \
+                                  background:"+colorScale[i]+";'>\
+                                  Legend for color "+i.toString()+"</p>");
+    }
 
     // this part is used to push data into canvas
     // and paint color
@@ -129,17 +138,24 @@ $(document).ready(function(){
 
     });
 
-    // users change color scale on the 2D map    
-    $("#colorConfirmButton").click(function(){
-      // update color scale
-      var startColor = document.getElementById("startColorID").value;
-      var endColor = document.getElementById("endColorID").value;
-      colorScale = chroma.scale([startColor,endColor]).colors(scaleSize);
+    // // users change color scale on the 2D map    
+    // $("#colorConfirmButton").click(function(){
+    //   // update color scale
+    //   var startColor = $("#startColorID").val();
+    //   var endColor = $("#endColorID").val();
+    //   colorScale = chroma.scale([startColor,endColor]).colors(scaleSize);
 
-      resetCanvas(vegOrigin);
+    //   // add legend for the color panel
+    //   for(var i=0; i<scaleSize; i++)
+    //   {
+    //     $("#colorPanel"+i.toString()).css("background-color:"+colorScale[i]);
+    //   }
 
-      updateMapOverlay();
-    });
+
+    //   resetCanvas(vegOrigin);
+
+    //   updateMapOverlay();
+    // });
 
     $("#removeOverlay").click(function(){
       removeOverlay();
