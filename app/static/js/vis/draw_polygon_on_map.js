@@ -68,7 +68,8 @@ $(document).ready(function(){
     canvas2DContext = canvasHandle.getContext("2d");
 
     // this is for define color for the cells
-    colorScale = ["#FFFFFF","#E0E0E0","#C0C0C0","#A0A0A0","#808080"];
+    var scaleSize = Object.size(inputJson['vegetation_map']);
+    colorScale = chroma.scale(['white','black']).colors(scaleSize);
 
     // this part is used to push data into canvas
     // and paint color
@@ -126,6 +127,18 @@ $(document).ready(function(){
           }
       });
 
+    });
+
+    // users change color scale on the 2D map    
+    $("#colorConfirmButton").click(function(){
+      // update color scale
+      var startColor = document.getElementById("startColorID").value;
+      var endColor = document.getElementById("endColorID").value;
+      colorScale = chroma.scale([startColor,endColor]).colors(scaleSize);
+
+      resetCanvas(vegOrigin);
+
+      updateMapOverlay();
     });
 
     $("#removeOverlay").click(function(){
