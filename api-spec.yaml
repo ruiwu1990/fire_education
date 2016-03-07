@@ -10,7 +10,7 @@ info:
         calls.
 
 #host: virtualwatershed.org
-host: localhost\:5000
+host: "localhost:5000"
 basePath: /api
 
 schemes:
@@ -30,6 +30,17 @@ paths:
     #############
     # Scenarios #
     #############
+    /base-veg-map:
+        get:
+            summary: get the base map used to generate initial view of landscape
+            tags:
+                - scenarios
+            operationId: getBaseVegetationMap
+
+            responses:
+                200:
+                    description: "successful operation"
+
     /scenarios:
         get:
             summary: list all scenarios
