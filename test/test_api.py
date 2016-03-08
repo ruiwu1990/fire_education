@@ -28,6 +28,7 @@ class TestAPI(unittest.TestCase):
         # send requests to server that will edit test/data/parameter.nc
         raw_data = '''
             {
+                "name": "test-scenario-1",
                 "vegetation_updates": [
 
                     {
@@ -40,7 +41,7 @@ class TestAPI(unittest.TestCase):
                     {
                         "cov_type_code": 1,
                         "HRU_number": [
-                            1, 5, 11, 12
+                            1, 5, 11, 12, 19
                         ]
                     }
                 ]
@@ -49,6 +50,7 @@ class TestAPI(unittest.TestCase):
 
         raw_data2 = '''
             {
+                "name": "test-scenario-2",
                 "vegetation_updates": [
 
                     {
@@ -69,13 +71,17 @@ class TestAPI(unittest.TestCase):
             }
         '''
 
-        res1 = self.client.post('/api/scenarios', data=json.loads(raw_data),
+        res1 = self.client.post('/api/scenarios', data=raw_data,
                                 headers={
                                    'Content-Type': 'application/json',
                                    'Origin': '*'}
                                 )
 
-        res2 = self.client.post('/api/scenarios', data=raw_data2)
+        res2 = self.client.post('/api/scenarios', data=raw_data2,
+                                headers={
+                                    'Content-Type': 'application/json',
+                                    'Origin': '*'}
+                                )
 
         # check the results from posts above; maps should be updated as follows
         veg_0_hru_res1 = res1.data['']

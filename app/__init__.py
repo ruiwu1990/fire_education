@@ -5,11 +5,7 @@ from flask import Flask
 from flask_cors import CORS
 from flask_mongoengine import MongoEngine
 
-# if there is an exception, we are running tests
-try:
-    from config import config
-except ImportError:
-    from ..config import config
+from config import config
 
 
 db = MongoEngine()

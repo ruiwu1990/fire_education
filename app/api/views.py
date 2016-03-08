@@ -12,10 +12,7 @@ import json
 
 from . import api
 from ..models import Scenario, Hydrograph, VegetationMapByHRU, Inputs, Outputs
-from util import (add_values_into_json,
-                  propagate_all_vegetation_changes,
-                  get_veg_map_by_hru)
-
+from util import propagate_all_vegetation_changes, get_veg_map_by_hru
 
 
 @api.route('/api/scenarios/<scenario_id>', methods=['GET', 'DELETE'])
@@ -59,7 +56,10 @@ def scenarios():
     """
     if request.method == 'GET':
 
-        scenarios = Scenario.objects.get()
+        try:
+            scenarios = Scenario.objects.get()
+        except:
+            scenarios = []
 
         return jsonify(scenarios=scenarios)
 
@@ -69,6 +69,7 @@ def scenarios():
         # assemble parts of a new scenario record
         vegetation_updates = json.dumps(request.json['vegetation_updates'])
 
+        # import ipdb; ipdb.set_trace()
         name = request.json['name']
 
         time_received = datetime.now()
@@ -113,4 +114,9 @@ def scenarios():
 def hru_veg_json():
     if request.method == 'GET':
         """generate json file from netcdf file"""
-        return jsonify(add_values_into_json())
+
+        BASE_PARAMETER_NC = app.config['BASE_PARAMETER_NC']
+
+        return jsonify(
+            get_veg_map_by_hru(BASE_PARAMETER_NC)
+        )
