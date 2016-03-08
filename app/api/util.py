@@ -103,3 +103,19 @@ def propagate_single_vegetation_change(original_prms_params, veg_value, hrus):
     mod_prms_params = netCDF4.Dataset()
 
     return mod_prms_params
+
+
+def propagate_all_vegetation_changes(original_prms_params, vegetation_updates):
+    """
+    Given a vegetation_updates object and an original_parameters netcdf,
+    propagate the updates through the original prms params netcdf and return
+    an updated copy of the PRMS parameter netCDF
+    """
+    return original_prms_params
+
+
+def get_veg_map_by_hru(prms_params):
+    """
+    TODO will replace add_values_into_json
+    """
+    pass

@@ -3,15 +3,19 @@ PRMS Fire Modeling API
 
 Date: Feb 25 2016
 """
+from datetime import datetime
+
 from flask import jsonify, request, Response
-from flask_cors import cross_origin
+from flask import current_app as app
+
 import json
 
-import netCDF4
-import os
-
 from . import api
-from util import add_values_into_json
+from ..models import Scenario, Hydrograph, VegetationMapByHRU, Inputs, Outputs
+from util import (add_values_into_json,
+                  propagate_all_vegetation_changes,
+                  get_veg_map_by_hru)
+
 
 
 @api.route('/api/scenarios/<scenario_id>', methods=['GET', 'DELETE'])
@@ -54,14 +58,55 @@ def scenarios():
     a new scenario, respectively.
     """
     if request.method == 'GET':
-        return jsonify(scenarios=EXAMPLE_SCENARIOS)
+
+        scenarios = Scenario.objects.get()
+
+        return jsonify(scenarios=scenarios)
+
     else:
-        return jsonify(
-            {
-                'message':
-                'POST received! Soon you\'ll actually kick off a model!'
-            }
+        BASE_PARAMETER_NC = app.config['BASE_PARAMETER_NC']
+
+        # assemble parts of a new scenario record
+        vegetation_updates = json.dumps(request.json['vegetation_updates'])
+
+        name = request.json['name']
+
+        time_received = datetime.now()
+
+        updated_parameter_nc = propagate_all_vegetation_changes(
+            BASE_PARAMETER_NC, vegetation_updates
         )
+
+        updated_vegetation_map = get_veg_map_by_hru(updated_parameter_nc)
+        veg_map_by_hru = VegetationMapByHRU.from_json(updated_vegetation_map)
+
+        # TODO placeholder
+        time_finished = datetime.now()
+
+        # TODO placeholder
+        inputs = Inputs()
+
+        # TODO placeholder
+        outputs = Outputs()
+
+        # TODO placeholder
+        hydrograph = Hydrograph(
+            time_array=[datetime(2010, 10, 1, 0), datetime(2010, 10, 1, 1),
+                        datetime(2010, 10, 1, 2), datetime(2010, 10, 1, 3)],
+            streamflow_array=[24.4, 34.6, 10.0, 86.0]
+        )
+
+        new_scenario = Scenario.from_json(
+            name=name,
+            time_received=time_received,
+            time_finished=time_finished,
+            veg_map_by_hru=veg_map_by_hru,
+            inputs=inputs,
+            outputs=outputs,
+            hydrograph=hydrograph
+        )
+
+        return jsonify(new_scenario.to_json())
 
 
 @api.route('/api/base-veg-map', methods=['GET'])
@@ -69,92 +114,3 @@ def hru_veg_json():
     if request.method == 'GET':
         """generate json file from netcdf file"""
         return jsonify(add_values_into_json())
-
-
-ex_uu1 = '0'
-ex_uu2 = '1'
-
-EXAMPLE_SCENARIOS = [{
-    'name': 'Smaller fire',
-    'id': ex_uu1,
-    'time_received': '2016-02-25T18:22:01',
-    'time_finished': '2016-02-25T18:28:01',
-    'input': {
-        'control':
-            'https://prmstool.virtualwatershed.org/downloads/' +
-            ex_uu1 + '/control.dat',
-        'parameter':
-            'https://prmstool.virtualwatershed.org/downloads/' +
-            ex_uu1 + '/params.nc',
-        'data':
-            'https://prmstool.virtualwatershed.org/downloads/' +
-            ex_uu1 + '/data.nc',
-    },
-    'output': {
-        'animation':
-            'https://prmstool.virtualwatershed.org/downloads/' +
-            ex_uu1 + '/control.dat',
-        'data':
-            'https://prmstool.virtualwatershed.org/downloads/' +
-            ex_uu1 + '/data.nc',
-    },
-    'fire_geometry': {
-        'type': 'MultiPolygon',
-        'coordinates': [
-          [[[102.0, 2.0], [103.0, 2.0], [103.0, 3.0],
-              [102.0, 3.0], [102.0, 2.0]]],
-          [[[100.0, 0.0], [101.0, 0.0], [101.0, 1.0],
-              [100.0, 1.0], [100.0, 0.0]],
-           [[100.2, 0.2], [100.8, 0.2], [100.8, 0.8],
-              [100.2, 0.8], [100.2, 0.2]]]
-          ]
-    },
-    'total_fire_area(km^2)': 40.5,
-    'hydrograph': {
-        '2015-10-31': 23.2,
-        '2015-11-30': 18.5,
-        '2015-12-31': 70.4
-    }
-},
-    {
-    'name': 'Larger fire',
-    'id': ex_uu2,
-    'time_received': '2016-02-25T18:22:01',
-    'time_finished': '2016-02-25T18:28:01',
-    'input': {
-        'control':
-            'https://prmstool.virtualwatershed.org/downloads/' +
-            ex_uu2 + '/control.dat',
-        'parameter':
-            'https://prmstool.virtualwatershed.org/downloads/' +
-            ex_uu2 + '/params.nc',
-        'data':
-            'https://prmstool.virtualwatershed.org/downloads/' +
-            ex_uu2 + '/data.nc',
-    },
-    'output': {
-        'animation':
-            'https://prmstool.virtualwatershed.org/downloads/' +
-            ex_uu2 + '/control.dat',
-        'data':
-            'https://prmstool.virtualwatershed.org/downloads/' +
-            ex_uu2 + '/data.nc',
-    },
-    'fire_geometry': {
-        'type': 'MultiPolygon',
-        'coordinates': [
-          [[[102.0, 1.0], [103.0, 2.0], [103.0, 3.0],
-              [102.0, 3.0], [102.0, 2.0]]],
-          [[[100.0, 0.0], [101.0, 0.0], [101.0, 1.0],
-              [100.0, 1.0], [100.0, 0.0]],
-           [[100.2, 0.2], [100.8, 0.2], [100.8, 0.8],
-              [100.2, 0.8], [100.2, 0.2]]]
-          ]
-    },
-    'total_fire_area(km^2)': 60.0,
-    'hydrograph': {
-        '2015-10-31': 22.2,
-        '2015-11-30': 8.15,
-        '2015-12-31': 80.4
-    }
-}]
