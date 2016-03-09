@@ -10,7 +10,7 @@ class PRMSFile:
         self.basefile = basefile
         self.workingscenario = None
 
-    def BeginScenario(self, scenarioname):
+    def begin_scenario(self, scenarioname):
         '''
         Starts a new scenario based on the original file under a new name
 
@@ -24,7 +24,7 @@ class PRMSFile:
         shutil.copyfile(self.basefile, scenariofile)
         self.workingscenario = netCDF4.Dataset(scenariofile, 'r+')
 
-    def EndScenario(self):
+    def end_scenario(self):
         '''
         Close the working scenario and free our references to it
         :return:
@@ -34,7 +34,7 @@ class PRMSFile:
         self.workingscenario.close()
         self.workingscenario = None
 
-    def DebugDisplayCovType(self, coords):
+    def debug_display_cov_type(self, coords):
         '''
         For debug purposes; given a list of coordinates (hrus), display the coverage type for each coordinate
         :param coords: List of coordinates
@@ -46,7 +46,7 @@ class PRMSFile:
         for coord in coords:
             print "Coordinate {0}, {1}: {2}".format(coord[0], coord[1], self.workingscenario.variables['cov_type'][coord[0],coord[1]])
 
-    def UpdateCovType(self, x, y, val):
+    def update_cov_type(self, x, y, val):
         '''
         Update coverage type in a single hru using 2d coordinates
         :param x: x coordinate for hru
@@ -61,7 +61,7 @@ class PRMSFile:
         self.workingscenario.variables['cov_type'][x,y] = val
         #print "{0}, {1} Cov Type After: {2}".format(x, y, self.workingscenario.variables['cov_type'][x,y])
 
-    def BlockUpdateCovType(self, coords, val):
+    def block_update_cov_type(self, coords, val):
         '''
         Given a list of coordinates (hrus), update coverage type for each hru to given value
         :param coords: List of coordinates
@@ -73,7 +73,7 @@ class PRMSFile:
             return
         for coord in coords:
             #print "Coordinate {0}, {1}: ".format(coord[0], coord[1])
-            self.UpdateCovType(coord[0], coord[1], val)
+            self.update_cov_type(coord[0], coord[1], val)
 
 if __name__=="__main__":
     prmsfile = PRMSFile("parameter.nc")
@@ -83,24 +83,24 @@ if __name__=="__main__":
                   (2, 0), (2, 1), (2, 2)]
 
     try:
-        prmsfile.BeginScenario("test")
-        prmsfile.DebugDisplayCovType(coord_list)
-        prmsfile.BlockUpdateCovType(coord_list, 2)
-        prmsfile.DebugDisplayCovType(coord_list)
-        prmsfile.EndScenario()
+        prmsfile.begin_scenario("test")
+        prmsfile.debug_display_cov_type(coord_list)
+        prmsfile.block_update_cov_type(coord_list, 2)
+        prmsfile.debug_display_cov_type(coord_list)
+        prmsfile.end_scenario()
     except Exception as ex:
         print "Test run failed: " + ex.message
 
     print "Testing exceptions..."
     try:
-        prmsfile.DebugDisplayCovType(coord_list)
+        prmsfile.debug_display_cov_type(coord_list)
     except Exception as ex:
         print "DebugDisplayCovType properly failed"
     try:
-        prmsfile.BlockUpdateCovType(coord_list)
+        prmsfile.block_update_cov_type(coord_list)
     except Exception as ex:
         print "BlockUpdateCovType properly failed"
     try:
-        prmsfile.UpdateCovType(0, 0, 0)
+        prmsfile.update_cov_type(0, 0, 0)
     except Exception as ex:
         print "UpdateCovType properly failed"

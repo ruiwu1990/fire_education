@@ -58,7 +58,7 @@ lookup_funcs = { "snow_intcp" : lookup_snow_intcp_ref,
                  "jh_coef_hru" : lookup_jh_coef_hru_ref,
                  "rad_trncf" : lookup_rad_trncf_ref}
 
-def LookUp(varname, cov_type):
+def look_up(varname, cov_type):
     if varname not in lookup_vars:
         return None
     if cov_type < 0 or cov_type > 4:
@@ -66,12 +66,12 @@ def LookUp(varname, cov_type):
     return lookup_funcs[varname](cov_type)
 
 if __name__ == "__main__":
-    print LookUp("snow_intcp", 0)
-    print LookUp("srain_intcp", 1)
-    print LookUp("wrain_intcp", 2)
-    print LookUp("covden_sum", 3)
-    print LookUp("covden_win", 4)
-    print LookUp("jh_coef_hru", 0)
-    print LookUp("rad_trncf", 2)
-    print LookUp("bad_var", 0)
-    print LookUp("rad_trncf", 5)
+    print look_up("snow_intcp", 0)
+    print look_up("srain_intcp", 1)
+    print look_up("wrain_intcp", 2)
+    print look_up("covden_sum", 3)
+    print look_up("covden_win", 4)
+    print look_up("jh_coef_hru", 0)
+    print look_up("rad_trncf", 2)
+    print look_up("bad_var", 0)
+    print look_up("rad_trncf", 5)
