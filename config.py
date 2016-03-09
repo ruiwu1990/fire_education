@@ -10,10 +10,6 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 class Config:
     PRODUCTION = False
 
-    MONGODB_SETTINGS = {'db': 'scenarios'}
-
-    BASE_PARAMETER_NC = netCDF4.Dataset('app/static/data/parameter.nc', 'r')
-
     @staticmethod
     def init_app(app):
         pass
@@ -21,6 +17,10 @@ class Config:
 
 class DevelopmentConfig(Config):
     DEBUG = True
+
+    MONGODB_SETTINGS = {'db': 'scenarios'}
+
+    BASE_PARAMETER_NC = netCDF4.Dataset('app/static/data/parameter.nc', 'r')
 
 
 class TestingConfig(Config):

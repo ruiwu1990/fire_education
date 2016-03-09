@@ -5,7 +5,10 @@ Author: Matthew A. Turner
 Date: 2015-12-12
 """
 import json
+import os
 import unittest
+
+os.environ['FLASKCONFIG'] = 'testing'
 
 from manage import app
 
@@ -29,45 +32,26 @@ class TestAPI(unittest.TestCase):
         raw_data = '''
             {
                 "name": "test-scenario-1",
-                "vegetation_updates": [
-
-                    {
-                        "cov_type_code": 0,
-                        "HRU_number": [
-                            0, 6, 7, 8, 9, 10
-                        ]
-                    },
-
-                    {
-                        "cov_type_code": 1,
-                        "HRU_number": [
-                            1, 5, 11, 12, 19
-                        ]
-                    }
-                ]
+                "veg_map_by_hru": {
+                    "bare_ground": [0, 1, 2, 3, 5, 10, 11],
+                    "grasses": [4, 6, 7, 17, 18, 19],
+                    "shrubs": [9, 12, 13],
+                    "trees": [8, 14, 15, 16],
+                    "conifers": []
+                }
             }
         '''
 
         raw_data2 = '''
             {
                 "name": "test-scenario-2",
-                "vegetation_updates": [
-
-                    {
-                        "cov_type_code": 2,
-                        "HRU_number": [
-                            0, 6, 7, 8, 9, 10
-                        ]
-                    },
-
-                    {
-                        "cov_type_code": 3,
-                        "HRU_number": [
-                            1, 5, 11, 12
-                        ]
-                    }
-
-                ]
+                "veg_map_by_hru": {
+                    "bare_ground": [0, 10, 11],
+                    "grasses": [2, 3, 5, 7, 17, 18, 19],
+                    "shrubs": [9, 12, 13],
+                    "trees": [8, 14, 15, 16],
+                    "conifers": [4, 6, 1]
+                }
             }
         '''
 
@@ -84,13 +68,18 @@ class TestAPI(unittest.TestCase):
                                 )
 
         # check the results from posts above; maps should be updated as follows
-        veg_0_hru_res1 = res1.data['']
-        veg_1_hru_res1 = res1.data['']
+        # veg_0_hru_res1 = res1.data['']
+        r1_scenario = json.loads(json.loads(res1.data)['scenario'])
+        vegmap1_code0 = r1_scenario['veg_map_by_hru']['bare_ground']
+        import ipdb; ipdb.set_trace()
 
-        veg_2_hru_res2 = res2.data['']
-        veg_3_hru_res2 = res2.data['']
+        assert vegmap1_code0 == [0, 6, 7, 8, 9, 10]
+        assert False
+        # veg_1_hru_res1 = res1.data['']
 
-        assert veg_0_hru_res1 == [0, 6, 7, 8, 9, 10]
+        # veg_2_hru_res2 = res2.data['']
+        # veg_3_hru_res2 = res2.data['']
+
 
 
         # check pulling all scenarios contains the two we've created

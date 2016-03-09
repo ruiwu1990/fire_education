@@ -69,7 +69,6 @@ def scenarios():
         # assemble parts of a new scenario record
         vegetation_updates = json.dumps(request.json['vegetation_updates'])
 
-        # import ipdb; ipdb.set_trace()
         name = request.json['name']
 
         time_received = datetime.now()
@@ -78,8 +77,7 @@ def scenarios():
             BASE_PARAMETER_NC, vegetation_updates
         )
 
-        updated_vegetation_map = get_veg_map_by_hru(updated_parameter_nc)
-        veg_map_by_hru = VegetationMapByHRU.from_json(updated_vegetation_map)
+        updated_veg_map_by_hru = get_veg_map_by_hru(updated_parameter_nc)
 
         # TODO placeholder
         time_finished = datetime.now()
@@ -97,17 +95,17 @@ def scenarios():
             streamflow_array=[24.4, 34.6, 10.0, 86.0]
         )
 
-        new_scenario = Scenario.from_json(
+        new_scenario = Scenario(
             name=name,
             time_received=time_received,
             time_finished=time_finished,
-            veg_map_by_hru=veg_map_by_hru,
+            veg_map_by_hru=updated_veg_map_by_hru,
             inputs=inputs,
             outputs=outputs,
             hydrograph=hydrograph
         )
 
-        return jsonify(new_scenario.to_json())
+        return jsonify(scenario=new_scenario.to_json())
 
 
 @api.route('/api/base-veg-map', methods=['GET'])

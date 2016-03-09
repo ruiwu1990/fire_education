@@ -6,7 +6,7 @@ class Hydrograph(db.EmbeddedDocument):
     Hydrograph output data
     """
     time_array = db.ListField(db.DateTimeField())
-    streamflow_array = db.ListField(db.DateTimeField())
+    streamflow_array = db.ListField(db.FloatField())
 
 
 class VegetationMapByHRU(db.EmbeddedDocument):
@@ -18,22 +18,36 @@ class VegetationMapByHRU(db.EmbeddedDocument):
     shrubs = db.ListField(db.IntField())
     trees = db.ListField(db.IntField())
     conifers = db.ListField(db.IntField())
+    projection_information = db.EmbeddedDocumentField('ProjectionInformation')
+
+
+class ProjectionInformation(db.EmbeddedDocument):
+    """
+    Information used to display gridded data on a map
+    """
+    ncol = db.IntField()
+    nrow = db.IntField()
+    xllcorner = db.FloatField()
+    yllcorner = db.FloatField()
+    xurcorner = db.FloatField()
+    yurcorner = db.FloatField()
+    cellsize = db.FloatField()
 
 
 class Inputs(db.EmbeddedDocument):
     """
     download links to control, data, and parameter files for a given scenario
     """
-    control = db.URLField(default='example.com/control.dat')
-    parameter = db.URLField(default='example.com/parameter.nc')
-    data = db.URLField(default='example.com/data.nc')
+    control = db.URLField(default='http://example.com/control.dat')
+    parameter = db.URLField(default='http://example.com/parameter.nc')
+    data = db.URLField(default='http://example.com/data.nc')
 
 
 class Outputs(db.EmbeddedDocument):
     """
     download links to PRMS outputs from scenario
     """
-    statvar = db.URLField(default='example.com/statvar.nc')
+    statvar = db.URLField(default='http://example.com/statvar.nc')
 
 
 class Scenario(db.Document):
@@ -50,7 +64,7 @@ class Scenario(db.Document):
     inputs = db.EmbeddedDocumentField('Inputs')
     outputs = db.EmbeddedDocumentField('Outputs')
 
-    hydrograph = db.EmbeddedDocumentListField('Hydrograph')
+    hydrograph = db.EmbeddedDocumentField('Hydrograph')
 
     def __str__(self):
 

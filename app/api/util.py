@@ -2,6 +2,7 @@ import netCDF4
 
 from numpy import where
 
+from ..models import VegetationMapByHRU, ProjectionInformation
 
 LEHMAN_CREEK_CELLSIZE = 100  # in meters; should be in netCDF, but it's not
 
@@ -30,39 +31,48 @@ def propagate_all_vegetation_changes(original_prms_params, vegetation_updates):
     Given a vegetation_updates object and an original_parameters netcdf,
     propagate the updates through the original prms params netcdf and return
     an updated copy of the PRMS parameter netCDF
+
+    Returns
     """
-    return original_prms_params
+
+
+
+
+    return ret
 
 
 def get_veg_map_by_hru(prms_params):
     """
     TODO will replace add_values_into_json
     """
-    lower_left_lat = prms_params.variables['lat'][:][-1]
+    # latitudes read from top to bottom
     upper_right_lat = prms_params.variables['lat'][:][0]
+    lower_left_lat = prms_params.variables['lat'][:][-1]
 
+    # longitudes get increasingly negative from right to left
     lower_left_lon = prms_params.variables['lon'][:][0]
     upper_right_lon = prms_params.variables['lon'][:][-1]
 
     ctv = prms_params.variables['cov_type'][:].flatten()
 
-    data = {
-        'vegetation_map': {
-            '0': {'HRU_number': where(ctv == 0)[0].tolist()},
-            '1': {'HRU_number': where(ctv == 1)[0].tolist()},
-            '2': {'HRU_number': where(ctv == 2)[0].tolist()},
-            '3': {'HRU_number': where(ctv == 3)[0].tolist()},
-            '4': {'HRU_number': where(ctv == 4)[0].tolist()}
-        },
-        'projection_information': {
-            'ncol': prms_params.number_of_columns,
-            'nrow': prms_params.number_of_rows,
-            'xllcorner': lower_left_lon,
-            'yllcorner': lower_left_lat,
-            'xurcorner': upper_right_lon,
-            'yurcorner': upper_right_lat,
-            'cellsize(m)': LEHMAN_CREEK_CELLSIZE
-        }
-    }
+    projection_information = ProjectionInformation(
+        ncol=prms_params.number_of_columns,
+        nrow=prms_params.number_of_rows,
+        xllcorner=lower_left_lon,
+        yllcorner=lower_left_lat,
+        xurcorner=upper_right_lon,
+        yurcorner=upper_right_lat,
+        cellsize=LEHMAN_CREEK_CELLSIZE
+    )
 
-    return data
+    vegmap = VegetationMapByHRU(
+        bare_ground=where(ctv == 0)[0].tolist(),
+        grasses=where(ctv == 1)[0].tolist(),
+        shrubs=where(ctv == 2)[0].tolist(),
+        trees=where(ctv == 3)[0].tolist(),
+        conifers=where(ctv == 4)[0].tolist(),
+
+        projection_information=projection_information
+    )
+
+    return vegmap
