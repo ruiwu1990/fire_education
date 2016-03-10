@@ -44,6 +44,13 @@ $(document).ready(function(){
   // url for overlay image
   var imgURL;
 
+  // this is for mouse dragging
+  var isDragging = false;
+  var isMousePressing = false;
+  var firstPosition;
+  var secondPosition;
+
+
   $.get('/api/base-veg-map', function(data){
     inputJson = data;
 
@@ -92,10 +99,36 @@ $(document).ready(function(){
     // TODO map overlay works correctly
     overlayCanvasonGoogleMap(latLonInformation['xllcorner'],latLonInformation['xurcorner'],latLonInformation['yllcorner'],latLonInformation['yurcorner']);
 
-    $("#myCanvas").click(function(evt){
-      clickTime = clickTime + 1;
-      var mousePos = getMousePos(canvasHandle, evt);
-      changeCanvasCellColor(mousePos,"#FF00FF");
+    $("#myCanvas")
+    .mousedown(function(evt){
+      isMousePressing = true;
+    })
+    .mousemove(function(evt){
+      // record the first mouse position
+      if(isDragging==false && isMousePressing==true)
+      {
+        // start point
+        clickTime = 1; 
+        firstPosition = getMousePos(canvasHandle, evt);
+        isDragging = true;
+        changeCanvasCellColor(firstPosition,"#FF00FF");
+      }
+      else if(isDragging == true && isMousePressing==true)
+      {
+        clickTime = 2; 
+        secondPosition = getMousePos(canvasHandle, evt);
+        changeCanvasCellColor(secondPosition,"#FF00FF");
+      }
+    })
+    .mouseup(function(evt){
+      isDragging = false;
+      isMousePressing = false;
+      // push the final chosen area into chosenAreaInfo
+      // get the current chosen color number
+      var colorOptNum =
+            parseInt($('input[name="vegcode-select"]:checked').val());
+      chosenAreaInfo.push({colorNum:colorOptNum,chosenArea:chosenHRU});
+      chosenHRU=[];
     });
 
 
@@ -319,8 +352,8 @@ $(document).ready(function(){
   function recordChosenAreaInfo(p1,p2)
   {
     // get the current chosen color number
-    var colorOptNum =
-          parseInt($('input[name="vegcode-select"]:checked').val());
+    // var colorOptNum =
+    //       parseInt($('input[name="vegcode-select"]:checked').val());
 
     for(var m=p1.y; m<=p2.y; m++)
     {
@@ -330,8 +363,8 @@ $(document).ready(function(){
       }
     }
     
-    chosenAreaInfo.push({colorNum:colorOptNum,chosenArea:chosenHRU});
-    chosenHRU=[];
+    // chosenAreaInfo.push({colorNum:colorOptNum,chosenArea:chosenHRU});
+    // chosenHRU=[];
   }
 
   function changeCanvasCellColor(mousePosition,color)
