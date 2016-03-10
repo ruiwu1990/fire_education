@@ -26,15 +26,27 @@ def propagate_single_vegetation_change(original_prms_params, veg_value, hrus):
     return mod_prms_params
 
 
-def propagate_all_vegetation_changes(original_prms_params, vegetation_updates):
+def propagate_all_vegetation_changes(original_prms_params, veg_map_by_hru):
     """
     Given a vegetation_updates object and an original_parameters netcdf,
     propagate the updates through the original prms params netcdf and return
     an updated copy of the PRMS parameter netCDF
 
-    Returns
+    Arguments:
+        original_prms_params (netCDF4.Dataset): Base PRMS parameters for the
+            watershed under investigation
+        veg_map_by_hru (dict): Dictionary with structure
+            {
+                'bare_ground': [ (HRUs with bare_ground) ],
+                'grasses': [ (HRUs with grasses) ],
+                #  ... and so on with fields as given in app/models.py
+            }
+
+    Returns:
+        (netCDF4.Dataset) netCDF Dataset with parameters updated according to
+            the veg_map_by_hru
     """
-    ret = {}
+    ret = original_prms_params
     return ret
 
 

@@ -276,3 +276,14 @@ definitions:
                     type: object
                     schema:
                         $ref: '#/definitions/Scenario'
+
+    Hydrograph:
+        properties:
+            time_array:
+                type: array
+                items:
+                    type: dateTime
+            streamflow_array:
+                type: array
+                items:
+                    type: float

@@ -56,6 +56,7 @@ class Scenario(db.Document):
     """
     name = db.StringField(required=True)
     user = db.StringField(default='anonymous')
+
     time_received = db.DateTimeField(required=True)
     time_finished = db.DateTimeField(required=True)
 

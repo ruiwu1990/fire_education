@@ -2,7 +2,7 @@
 Unit tests for server functions contained in app/api/views.py
 
 Author: Matthew A. Turner
-Date: 2015-12-12
+Date: 2016-03-10
 """
 import json
 import os
@@ -71,16 +71,8 @@ class TestAPI(unittest.TestCase):
         # veg_0_hru_res1 = res1.data['']
         r1_scenario = json.loads(json.loads(res1.data)['scenario'])
         vegmap1_code0 = r1_scenario['veg_map_by_hru']['bare_ground']
-        import ipdb; ipdb.set_trace()
 
         assert vegmap1_code0 == [0, 6, 7, 8, 9, 10]
-        assert False
-        # veg_1_hru_res1 = res1.data['']
-
-        # veg_2_hru_res2 = res2.data['']
-        # veg_3_hru_res2 = res2.data['']
-
-
 
         # check pulling all scenarios contains the two we've created
         all_scenarios_res = self.client.get('/api/scenarios')

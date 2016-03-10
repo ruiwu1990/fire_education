@@ -67,14 +67,14 @@ def scenarios():
         BASE_PARAMETER_NC = app.config['BASE_PARAMETER_NC']
 
         # assemble parts of a new scenario record
-        vegetation_updates = json.dumps(request.json['vegetation_updates'])
+        veg_map_by_hru = json.dumps(request.json['veg_map_by_hru'])
 
         name = request.json['name']
 
         time_received = datetime.now()
 
         updated_parameter_nc = propagate_all_vegetation_changes(
-            BASE_PARAMETER_NC, vegetation_updates
+            BASE_PARAMETER_NC, veg_map_by_hru
         )
 
         updated_veg_map_by_hru = get_veg_map_by_hru(updated_parameter_nc)
