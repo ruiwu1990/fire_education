@@ -111,22 +111,36 @@ $(document).ready(function(){
         clickTime = 1; 
         firstPosition = getMousePos(canvasHandle, evt);
         isDragging = true;
-        changeCanvasCellColor(firstPosition,"#FF00FF");
+        changeCanvasCellColor(firstPosition,"#FFFF00");
       }
       else if(isDragging == true && isMousePressing==true)
       {
         clickTime = 2; 
         secondPosition = getMousePos(canvasHandle, evt);
-        changeCanvasCellColor(secondPosition,"#FF00FF");
+        changeCanvasCellColor(secondPosition,"#FFFF00");
       }
     })
     .mouseup(function(evt){
-      isDragging = false;
       isMousePressing = false;
-      // push the final chosen area into chosenAreaInfo
+      // choose single cell
+      if(isDragging==false)
+      {
+        clickTime = 1;
+        firstPosition = getMousePos(canvasHandle, evt);
+        changeCanvasCellColor(firstPosition,"#FF00FF");
+        secondPosition = firstPosition;
+        clickTime = 2;
+        changeCanvasCellColor(secondPosition,"#FF00FF");
+      }
+      // choose an area
+      else if(isDragging==true)
+      {
+        isDragging = false;
+      }
+       // push the final chosen area into chosenAreaInfo
       // get the current chosen color number
-      var colorOptNum =
-            parseInt($('input[name="vegcode-select"]:checked').val());
+      var colorOptNum = parseInt($('#vegetation-type-selector label.active input').val());
+            //parseInt($('input[name="vegcode-select"]:checked').val());
       chosenAreaInfo.push({colorNum:colorOptNum,chosenArea:chosenHRU});
       chosenHRU=[];
     });
@@ -341,6 +355,11 @@ $(document).ready(function(){
       // Here +1 coz need to count the bottom line too
       canvas2DContext.fillRect(p1.x*cellWidth, p1.y*cellHeight, cellWidth*(p2.x-p1.x+1), cellHeight);
     }
+    // choose the single cell
+    else if(p2.x==p1.x&&p2.y==p1.y)
+    {
+      canvas2DContext.fillRect(p1.x*cellWidth, p1.y*cellHeight, cellWidth, cellHeight);  
+    }
     // push chosen HRU cell num
     recordChosenAreaInfo(p1,p2);
 
@@ -354,12 +373,20 @@ $(document).ready(function(){
     // get the current chosen color number
     // var colorOptNum =
     //       parseInt($('input[name="vegcode-select"]:checked').val());
-
-    for(var m=p1.y; m<=p2.y; m++)
+    
+    // single point
+    if(p1.x==p2.x && p1.y==p2.y)
     {
-      for(var i=p1.x; i<=p2.x; i++)
+      chosenHRU.push(p1.x+p2.y*dataX);
+    }
+    else
+    {
+      for(var m=p1.y; m<=p2.y; m++)
       {
-        chosenHRU.push(i+m*dataX);
+        for(var i=p1.x; i<=p2.x; i++)
+        {
+          chosenHRU.push(i+m*dataX);
+        }
       }
     }
     
@@ -387,21 +414,8 @@ $(document).ready(function(){
       showChosenRecArea(firstPoint,secondPoint);
 
     }
-    else
-    {
-      firstPoint.x = secondPoint.x;
-      firstPoint.y = secondPoint.y;
 
-      secondPoint.x = startX;
-      secondPoint.y = startY;
-
-      showChosenRecArea(firstPoint,secondPoint);
-
-    }
   }
-
-
-
 
 
 });
