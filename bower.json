@@ -21,6 +21,7 @@
     "bootswatch-dist": "3.3.6-sandstone",
     "react": "^0.14.7",
     "babel": "*",
-    "html2canvas": "^0.4.1"
+    "html2canvas": "^0.4.1",
+    "chroma-js": "^1.1.1"
   }
 }

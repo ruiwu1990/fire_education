@@ -14,6 +14,10 @@ db = MongoEngine()
 cors = CORS(resources={r'/api/*': {'origins': '*'}})
 
 
+# enable cross-origin resource sharing for the REST API
+cors = CORS(resources={r'/api/*': {'origins': '*'}})
+
+
 def create_app(config_name):
     app = Flask(__name__)
     app.config.from_object(config[config_name])

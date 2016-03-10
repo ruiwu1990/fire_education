@@ -75,7 +75,6 @@ paths:
                   type: string
                   description: descriptive name for the scenario
                   in: body
-                      
 
             responses:
                 200:
@@ -277,5 +276,3 @@ definitions:
                     type: object
                     schema:
                         $ref: '#/definitions/Scenario'
-
-

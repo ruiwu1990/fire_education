@@ -34,10 +34,7 @@ def propagate_all_vegetation_changes(original_prms_params, vegetation_updates):
 
     Returns
     """
-
-
-
-
+    ret = {}
     return ret
 
 

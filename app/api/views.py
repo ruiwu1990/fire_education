@@ -11,7 +11,7 @@ from flask import current_app as app
 import json
 
 from . import api
-from ..models import Scenario, Hydrograph, VegetationMapByHRU, Inputs, Outputs
+from ..models import Scenario, Hydrograph, Inputs, Outputs
 from util import propagate_all_vegetation_changes, get_veg_map_by_hru
 
 
@@ -22,7 +22,7 @@ def scenario_by_id(scenario_id):
     """
     if request.method == 'GET':
         try:
-            return jsonify(EXAMPLE_SCENARIOS[int(scenario_id)])
+            return jsonify({'message': 'implement me!'})
         except:
             return Response(
                 json.dumps(
