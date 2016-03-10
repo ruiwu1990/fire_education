@@ -2,7 +2,10 @@ __author__ = 'jerickson'
 
 import netCDF4
 import shutil
+import types
 import os
+import uuid
+import time
 
 ### PRMS File representation
 class PRMSFile:
@@ -20,7 +23,18 @@ class PRMSFile:
         if self.workingscenario is not None:
             raise Exception("Working Scenario already open")
             return
-        scenariofile = scenarioname + ".nc"
+        #uniqueID = uuid.uuid4()
+        #scenariofile =  "{0}_{1}_{2}.nc".format(scenarioname,uniqueID,time.strftime("%d_%b_%Y__%H_%M_%S", time.gmtime()))
+
+        scenariofile = ""
+        if os.path.exists("{0}.nc".format(scenarioname)):
+            sequence = 2
+            while os.path.exists("{0}-{1}.nc".format(scenarioname, sequence)):
+                sequence = sequence + 1
+            scenariofile = "{0}-{1}.nc".format(scenarioname, sequence)
+        else:
+            scenariofile = "{0}.nc".format(scenarioname)
+        print scenariofile
         shutil.copyfile(self.basefile, scenariofile)
         self.workingscenario = netCDF4.Dataset(scenariofile, 'r+')
 
@@ -44,7 +58,14 @@ class PRMSFile:
             raise Exception("No working scenario defined")
             return
         for coord in coords:
-            print "Coordinate {0}, {1}: {2}".format(coord[0], coord[1], self.workingscenario.variables['cov_type'][coord[0],coord[1]])
+            if isinstance(coord, types.IntType):
+                #Single Coordinate given, convert to x,y
+                x_max = len(self.workingscenario.dimensions['lon'])
+                x = coord / x_max
+                y = coord % x_max
+                print "Coordinate {0} ({1}, {2}): {3}".format(coord, x, y, self.workingscenario.variables['cov_type'][x,y])
+            elif isinstance(coord, types.TupleType):
+                print "Coordinate {0}, {1}: {2}".format(coord[0], coord[1], self.workingscenario.variables['cov_type'][coord[0],coord[1]])
 
     def update_cov_type(self, x, y, val):
         '''
@@ -73,20 +94,35 @@ class PRMSFile:
             return
         for coord in coords:
             #print "Coordinate {0}, {1}: ".format(coord[0], coord[1])
-            self.update_cov_type(coord[0], coord[1], val)
+            if isinstance(coord, types.IntType):
+                #Single Coordinate given, convert to x,y
+                x_max = len(self.workingscenario.dimensions['lon'])
+                x = coord / x_max
+                y = coord % x_max
+                #print "x, y: {0}, {1}".format(x,y)
+                self.update_cov_type(x, y, val)
+            elif isinstance(coord, types.TupleType):
+                #x,y tuple given
+                self.update_cov_type(coord[0], coord[1], val)
 
 if __name__=="__main__":
     prmsfile = PRMSFile("parameter.nc")
 
-    coord_list = [(0, 0), (0, 1), (0, 2),
+    coord_list_old = [(0, 0), (0, 1), (0, 2),
                   (1, 0), (1, 1), (1, 2),
                   (2, 0), (2, 1), (2, 2)]
+
+    coord_list = [0,   1,   2,
+                  96,  97,  98,
+                  192, 193, 194]
 
     try:
         prmsfile.begin_scenario("test")
         prmsfile.debug_display_cov_type(coord_list)
+        prmsfile.debug_display_cov_type(coord_list_old)
         prmsfile.block_update_cov_type(coord_list, 2)
         prmsfile.debug_display_cov_type(coord_list)
+        prmsfile.debug_display_cov_type(coord_list_old)
         prmsfile.end_scenario()
     except Exception as ex:
         print "Test run failed: " + ex.message
