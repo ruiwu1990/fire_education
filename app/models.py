@@ -1,3 +1,5 @@
+import json
+
 from . import db
 
 
@@ -66,6 +68,23 @@ class Scenario(db.Document):
     outputs = db.EmbeddedDocumentField('Outputs')
 
     hydrograph = db.EmbeddedDocumentField('Hydrograph')
+
+    def to_json(self):
+        """
+        Override db.Document's to_json for custom date fomratting
+        """
+        base_json = db.Document.to_json(self)
+
+        js_dict = json.loads(base_json)
+
+        js_dict['hydrograph']['time_array'] = [
+            d.isoformat() for d in self.hydrograph.time_array
+        ]
+
+        js_dict['time_received'] = self.time_received.isoformat()
+        js_dict['time_finished'] = self.time_finished.isoformat()
+
+        return json.dumps(js_dict)
 
     def __str__(self):
 
