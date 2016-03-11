@@ -84,6 +84,8 @@ class Scenario(db.Document):
         js_dict['time_received'] = self.time_received.isoformat()
         js_dict['time_finished'] = self.time_finished.isoformat()
 
+        js_dict['id'] = str(self.pk)
+
         return json.dumps(js_dict)
 
     def __str__(self):

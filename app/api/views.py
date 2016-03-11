@@ -21,9 +21,13 @@ def scenario_by_id(scenario_id):
     Look up or delete a scenario by its id
     """
     if request.method == 'GET':
-        try:
-            return jsonify({'message': 'implement me!'})
-        except:
+
+        scenario = Scenario.objects(id=scenario_id).first()
+
+        if scenario:
+            return jsonify(scenario=scenario.to_json())
+
+        else:
             return Response(
                 json.dumps(
                     {'message': 'no scenario id found! ' +
@@ -32,19 +36,31 @@ def scenario_by_id(scenario_id):
             )
 
     if request.method == 'DELETE':
-        if scenario_id not in ['0', '1']:
+
+        scenario = Scenario.objects(id=scenario_id).first()
+
+        if scenario:
+
+            try:
+                scenario.delete()
+                return jsonify(
+                    message='scenario with id ' + scenario_id + ' removed!'
+                )
+
+            except:
+                return Response(
+                    json.dumps(
+                        {'message': 'error deleting scenario ' + scenario_id}
+
+                    ), 400, mimetype='application/json'
+                )
+
+        else:
+
             return Response(
                 json.dumps(
-                    {'message': 'no scenario id found! ' +
-                                'currently the scenario id must be 1 or 0!'}
+                    {'message': 'scenario_id' + scenario_id + 'not found'}
                 ), 400, mimetype='application/json'
-            )
-        else:
-            return jsonify(
-                {
-                    'message': 'scenario with id ' + scenario_id +
-                               ' removed! (not really...)'
-                }
             )
 
 
@@ -57,7 +73,7 @@ def scenarios():
     if request.method == 'GET':
 
         try:
-            scenarios = Scenario.objects.get()
+            scenarios = Scenario.objects
         except:
             scenarios = []
 
@@ -104,6 +120,8 @@ def scenarios():
             outputs=outputs,
             hydrograph=hydrograph
         )
+
+        new_scenario.save()
 
         return jsonify(scenario=new_scenario.to_json())
 
