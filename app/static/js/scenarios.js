@@ -53,20 +53,19 @@ var ScenarioList = React.createClass({
 
     render: function() {
         var tableRows = this.props.data.scenarios.map(function(scenario) {
-
             return (
-                <tr key={scenario.name}>
+                <tr key={scenario._id.$oid}>
                     <td>{scenario.name}</td>
-                    <td>{scenario.time_received}</td>
-                    <td>{scenario.time_finished}</td>
+                    <td>{scenario.time_received.$date}</td>
+                    <td>{scenario.time_finished.$date}</td>
                     <td style={{textAlign: 'center'}}>{scenario['total_fire_area(km^2)']}</td>
                     <td>
-                        <a href={scenario.input.parameter}>
+                    <a href={scenario.inputs ? scenario.inputs.parameter : '#'}>
                             Download Input Parameters
                         </a>
                     </td>
                     <td>
-                        <a href={scenario.output.data}>
+                    <a href={scenario.outputs ? scenario.outputs.statvar : '#'}>
                             Download Output Data
                         </a>
                     </td>
@@ -130,7 +129,6 @@ $('#save-veg-update').click(function(e) {
 $('#veg-update-list').on('click', 'a.remove-veg-update', function(e) {
     $(e.toElement.parentElement).remove();
 });
-    ////console.log($('form').serializeJSON());
 
     //var formData = new FormData();
     //var form = $('form').serializeArray();

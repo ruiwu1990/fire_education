@@ -1,3 +1,4 @@
+import json
 import netCDF4
 
 from numpy import where
@@ -84,4 +85,4 @@ def get_veg_map_by_hru(prms_params):
         projection_information=projection_information
     )
 
-    return vegmap
+    return json.loads(vegmap.to_json())
