@@ -1,86 +1,88 @@
-import os
+import json
 import netCDF4
 
+from numpy import where
 
-def add_values_into_json():
+from ..models import VegetationMapByHRU, ProjectionInformation
 
-    # find path
-    app_root = os.path.dirname(os.path.abspath(__file__))
-    download_dir = app_root + '/../static/data/'
-    file_full_path = download_dir + 'parameter.nc'
+LEHMAN_CREEK_CELLSIZE = 100  # in meters; should be in netCDF, but it's not
 
-    file_handle = netCDF4.Dataset(file_full_path, 'r')
 
-    dimensions = [dimension for dimension in file_handle.dimensions]
-    for dimension in dimensions:
-        if dimension == 'lat':
-            number_of_latitude_values = len(file_handle.dimensions[dimension])
-        if dimension == 'lon':
-            number_of_longitude_values = len(file_handle.dimensions[dimension])
+def propagate_single_vegetation_change(original_prms_params, veg_value, hrus):
+    """
+    Given a PRMS netCDF file, a PRMS vegetation code (0-4), and a list of
+    HRU indices that should be changed, update the seven other
+    vegetation-dependent parameters.
 
-    latitude_values = file_handle.variables['lat'][:]
-    longitude_values = file_handle.variables['lon'][:]
-    lower_left_latitude = latitude_values[number_of_latitude_values-1]
-    lower_left_longitude = longitude_values[0]
-    upper_right_latitude = latitude_values[0]
-    upper_right_longitude = longitude_values[number_of_longitude_values-1]
+    Arguments:
+        original_prms_params (netCDF4.Dataset): The original parameters file
+        veg_value (int): The vegetation value, must be 0, 1, 2, 3, or 4
+        hrus (list(int)): List of HRU indices that should get the value given
+    """
+    assert veg_value in range(5), \
+        "PRMS Vegetation Values must be an integer from 0 to 4"
 
-    variables = [variable for variable in file_handle.variables]
-    variable_values = file_handle.variables['cov_type'][:,:]
-    list_of_variable_values = []
+    mod_prms_params = netCDF4.Dataset()
 
-    for i in range(number_of_latitude_values):
-        for j in range(len(variable_values[i])):
-            list_of_variable_values.append(int(variable_values[i][j]))
+    return mod_prms_params
 
-    index_of_zero_values = []
-    index_of_one_values = []
-    index_of_two_values = []
-    index_of_three_values = []
-    index_of_four_values = []
 
-    for index in [index for index, value in enumerate(list_of_variable_values) if value == 0]:
-        index_of_zero_values.append(index)
-    for index in [index for index, value in enumerate(list_of_variable_values) if value == 1]:
-        index_of_one_values.append(index)
-    for index in [index for index, value in enumerate(list_of_variable_values) if value == 2]:
-        index_of_two_values.append(index)
-    for index in [index for index, value in enumerate(list_of_variable_values) if value == 3]:
-        index_of_three_values.append(index)
-    for index in [index for index, value in enumerate(list_of_variable_values) if value == 4]:
-        index_of_four_values.append(index)
+def propagate_all_vegetation_changes(original_prms_params, veg_map_by_hru):
+    """
+    Given a vegetation_updates object and an original_parameters netcdf,
+    propagate the updates through the original prms params netcdf and return
+    an updated copy of the PRMS parameter netCDF
 
-    data = {
-              'vegetation_map':
-              {
-                '0': {
-                        'HRU_number': index_of_zero_values
-                     },
-                '1': {
-                        'HRU_number': index_of_one_values
-                     },
-                '2': {
-                        'HRU_number': index_of_two_values
-                     },
-                '3': {
-                        'HRU_number': index_of_three_values
-                     },
-                '4': {
-                        'HRU_number': index_of_four_values
-                     }
-              },
-              'projection_information':
-              {
-                'ncol': number_of_longitude_values,
-                'nrow': number_of_latitude_values,
-                'xllcorner': lower_left_longitude,
-                'yllcorner': lower_left_latitude,
-                'xurcorner': upper_right_longitude,
-                'yurcorner': upper_right_latitude,
-                'cellsize(m)': 100
-              }
+    Arguments:
+        original_prms_params (netCDF4.Dataset): Base PRMS parameters for the
+            watershed under investigation
+        veg_map_by_hru (dict): Dictionary with structure
+            {
+                'bare_ground': [ (HRUs with bare_ground) ],
+                'grasses': [ (HRUs with grasses) ],
+                #  ... and so on with fields as given in app/models.py
             }
 
-    file_handle.close()
+    Returns:
+        (netCDF4.Dataset) netCDF Dataset with parameters updated according to
+            the veg_map_by_hru
+    """
+    ret = original_prms_params
+    return ret
 
-    return data
+
+def get_veg_map_by_hru(prms_params):
+    """
+    TODO will replace add_values_into_json
+    """
+    # latitudes read from top to bottom
+    upper_right_lat = prms_params.variables['lat'][:][0]
+    lower_left_lat = prms_params.variables['lat'][:][-1]
+
+    # longitudes get increasingly negative from right to left
+    lower_left_lon = prms_params.variables['lon'][:][0]
+    upper_right_lon = prms_params.variables['lon'][:][-1]
+
+    ctv = prms_params.variables['cov_type'][:].flatten()
+
+    projection_information = ProjectionInformation(
+        ncol=prms_params.number_of_columns,
+        nrow=prms_params.number_of_rows,
+        xllcorner=lower_left_lon,
+        yllcorner=lower_left_lat,
+        xurcorner=upper_right_lon,
+        yurcorner=upper_right_lat,
+        cellsize=LEHMAN_CREEK_CELLSIZE
+    )
+
+    vegmap = VegetationMapByHRU(
+        bare_ground=where(ctv == 0)[0].tolist(),
+        grasses=where(ctv == 1)[0].tolist(),
+        shrubs=where(ctv == 2)[0].tolist(),
+        trees=where(ctv == 3)[0].tolist(),
+        conifers=where(ctv == 4)[0].tolist(),
+
+        projection_information=projection_information
+    )
+
+    return json.loads(vegmap.to_json())

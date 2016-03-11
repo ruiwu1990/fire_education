@@ -78,7 +78,8 @@ $(document).ready(function(){
     canvas2DContext = canvasHandle.getContext("2d");
 
     // this is for define color for the cells
-    var scaleSize = Object.size(inputJson['vegetation_map']);
+    //var scaleSize = Object.size(inputJson['vegetation_map']);
+    var scaleSize = 5;
     colorScale = chroma.scale(['pink','black','blue','red','green']).colors(scaleSize);
 
     // add legend for the color panel
@@ -97,7 +98,10 @@ $(document).ready(function(){
     // overlay canvas on google map
     var latLonInformation = inputJson['projection_information'];
     // TODO map overlay works correctly
-    overlayCanvasonGoogleMap(latLonInformation['xllcorner'],latLonInformation['xurcorner'],latLonInformation['yllcorner'],latLonInformation['yurcorner']);
+    overlayCanvasonGoogleMap(latLonInformation['xllcorner'],
+        latLonInformation['xurcorner'],
+        latLonInformation['yllcorner'],
+        latLonInformation['yurcorner']);
 
     $("#myCanvas")
     .mousedown(function(evt){
@@ -108,14 +112,14 @@ $(document).ready(function(){
       if(isDragging==false && isMousePressing==true)
       {
         // start point
-        clickTime = 1; 
+        clickTime = 1;
         firstPosition = getMousePos(canvasHandle, evt);
         isDragging = true;
         changeCanvasCellColor(firstPosition,"#FFFF00");
       }
       else if(isDragging == true && isMousePressing==true)
       {
-        clickTime = 2; 
+        clickTime = 2;
         secondPosition = getMousePos(canvasHandle, evt);
         changeCanvasCellColor(secondPosition,"#FFFF00");
       }
@@ -183,13 +187,12 @@ $(document).ready(function(){
           data: JSON.stringify(inputJson, null, '\t'),
           contentType: 'application/json;charset=UTF-8',
           success: function(result) {
-              console.log(result);
           }
       });
 
     });
 
-    // // users change color scale on the 2D map    
+     // users change color scale on the 2D map
     // $("#colorConfirmButton").click(function(){
     //   // update color scale
     //   var startColor = $("#startColorID").val();
@@ -263,18 +266,21 @@ $(document).ready(function(){
   function obtainJsoninto1D(inputJson)
   {
     var outputArr = new Array(dataX*dataY);
-
     // for this case veg_code is the loop count (from 0), vegCode is str
     // therefore veg_code = i.toString()
     var tempSize;
-    for(var i=0; i<Object.size(inputJson['vegetation_map']); i++)
-    {
-      tempSize = inputJson['vegetation_map'][i.toString()]['HRU_number'].length;
-      for(var m=0; m<tempSize; m++ )
-      {
-        outputArr[inputJson['vegetation_map'][i.toString()]['HRU_number'][m]] = i;
+    //for(var i=0; i<Object.size(inputJson['vegetation_map']); i++)
+    //{
+      $.each(['bare_ground', 'grasses', 'shrubs', 'trees', 'conifers'],
+      function(i, cov_type) {
+        tempSize = inputJson[cov_type].length;
+        for(var m=0; m<tempSize; m++ )
+        {
+          outputArr[inputJson[cov_type][m]] = i;
+        }
       }
-    }
+    );
+
     return outputArr;
   }
 
@@ -358,7 +364,7 @@ $(document).ready(function(){
     // choose the single cell
     else if(p2.x==p1.x&&p2.y==p1.y)
     {
-      canvas2DContext.fillRect(p1.x*cellWidth, p1.y*cellHeight, cellWidth, cellHeight);  
+      canvas2DContext.fillRect(p1.x*cellWidth, p1.y*cellHeight, cellWidth, cellHeight);
     }
     // push chosen HRU cell num
     recordChosenAreaInfo(p1,p2);
@@ -373,7 +379,7 @@ $(document).ready(function(){
     // get the current chosen color number
     // var colorOptNum =
     //       parseInt($('input[name="vegcode-select"]:checked').val());
-    
+
     // single point
     if(p1.x==p2.x && p1.y==p2.y)
     {
@@ -389,7 +395,7 @@ $(document).ready(function(){
         }
       }
     }
-    
+
     // chosenAreaInfo.push({colorNum:colorOptNum,chosenArea:chosenHRU});
     // chosenHRU=[];
   }
