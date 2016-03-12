@@ -83,13 +83,13 @@ $(document).ready(function(){
     colorScale = chroma.scale(['pink','black','blue','red','green']).colors(scaleSize);
 
     // add legend for the color panel
-    for(var i=0; i<scaleSize; i++)
-    {
-      $("#colorLegendDiv").append("<p style='border-radius:25px;\
-                                  padding:20px; \
-                                  background:"+colorScale[i]+";'>\
-                                  Legend for color "+i.toString()+"</p>");
-    }
+    //for(var i=0; i<scaleSize; i++)
+    //{
+      //$("#colorLegendDiv").append("<p style='border-radius:25px;\
+                                      //padding:20px; \
+                                  //background:"+colorScale[i]+";'>\
+                                  //Legend for color "+i.toString()+"</p>");
+    //}
 
     // this part is used to push data into canvas
     // and paint color

@@ -21,39 +21,85 @@
     {{ super() }}
     <style>
     #map {
-        width: 90%;
-        height: 350px;
-        margin: 20px auto;
+      width: 90%;
+      height: 350px;
+      margin: 20px auto;
     }
     #new-scenario-menu-content {
-        position: relative;
+      position: relative;
     }
     #scenario-list {
-        display: table;
+      display: table;
     }
     .section-header {
-        text-decoration: underline;
+      text-decoration: underline;
     }
     .btn-custom {
-        border-color: #dfd7ca;
-        border-width: 2px;
-        border-style: solid;
+      border-color: #dfd7ca;
+      border-width: 2px;
+      border-style: solid;
     }
     .btn-custom.active {
-        background-color: #f8f5f0;
+      background-color: #f8f5f0;
     }
     .btn-custom:hover {
-        background-color: #f8f5f0;
-        color: #3e3f3a;
+      background-color: #f8f5f0;
+      color: #3e3f3a;
+    }
+    .btn {
+      margin: 3.5px;
     }
     #vegetation-type-selector {
-        margin: 15px;
+      margin: 15px;
     }
     label {
-        display: block;
+      display: block;
     }
     a.remove-veg-update:hover {
-        cursor: pointer;
+      cursor: pointer;
+    }
+    span.legend {
+      display: inline-block;
+    }
+    span#bare-ground-square {
+      color: pink;  
+    }
+    span#grasses-square {
+      color: black;  
+    }
+    span#shrubs-square {
+      color: blue;  
+    }
+    span#trees-square {
+      color: red;  
+    }
+    span#conifers-square {
+      color: green;  
+    }
+    
+    input#map-toggle {
+      display: none;
+    }
+    input#map-toggle + div#mapControl {
+      display: block;
+    }
+    input#map-toggle:checked + div#mapControl {
+      display: none;
+    }
+    div#maps {
+      margin-top: 20px;
+    }
+    input.btn-sm-map {
+      border-style: solid;
+      border-width: 2px;
+      margin: 4px;
+    }
+    input.btn-sm-map:hover {
+      color:black; 
+      
+      border-style: solid;
+      border-width: 2px;
+      margin: 4px;
     }
     </style>
 {% endblock %}
@@ -76,31 +122,26 @@
     <div class="row">
         <h3 class="section-header">Create a New Scenario</h3>
         <h4>1. Select Vegetation Type</h4>
-        {% include 'includes/veg-type-selector.html' %}
-        <!-- Enable users to change color -->
-        <!-- <h5>You can set a different color scale from here</h5> -->
-        <!-- Using js from http://gka.github.io/chroma.js/ -->
-        {% include 'includes/color-panel.html' %}
+          {% include 'includes/veg-type-selector.html' %}
     </div>
 
 
     <div class="row">
-        <h4>2. Select HRU on map for the selected vegetation type then save to persist the change</h4>
-        <h5>(Repeat 1 & 2 to add more vegetation updates)</h5>
+      <h4>2. Select HRU on map for the selected vegetation type then save to persist the change</h4>
+      <h5>(Repeat 1 & 2 to add more vegetation updates)</h5>
 
 
-        <div id="new-scenario-top" align="center"
-             class="row">
+      <button class="btn btn-default" id="resetCanvasButton" style="width: 32%"> <!--style="width: 40%"/>-->
+        Reset Map 
+      </button>
+      <button class="btn btn-default" id="save-veg-update" style="width: 65%"> <!--style="width: 40%">-->
+          Confirm Vegetation Modification
+      </button>
 
-            <button class="btn btn-default" id="save-veg-update" style="width: 70%">
-                Modify Vegetation Region
-            </button>
-
-            <div id="veg-update-list"></div>
-        </div>
+      <div id="veg-update-list"></div>
 
 
-        <div id="maps" class="row">
+      <div id="maps" class="row">
 
             <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12" >
               <canvas class='mapCanvas' id="myCanvas" style="border:1px solid #c3c3c3;" >
@@ -110,27 +151,29 @@
 
             <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12" >
 
-              <div id='buttonDiv'>
-                <input type="button" id="resetCanvasButton" value="Reset Polygon" />
-                <input type="button" id="submitChangetoServerButton" value="Submit Change to the Server" />
-              </div>
-
+              <label for="map-toggle" style="font-size: 32px;">Click Here To Hide/Show Map</label>
+              <input id="map-toggle" type="checkbox">
               <div id='mapControl'>
-                <input type="button" id="removeOverlayButton" value="Remove the overlay image" />
-                <input type="button" id="addOverlayButton" value="add the overlay image" />
+                <input type="button" class="btn btn-sm btn-sm-map" 
+                       id="removeOverlayButton" value="Remove the overlay image" />
+                <input type="button" class="btn btn-sm btn-sm-map" 
+                       id="addOverlayButton" value="add the overlay image" />
                 <p>
-                    This is for opacity rate. It should be between 0 to 1.
+                    <h4>
+                      Set the opacity of the overlay (between 0 and 1.0)
+                    </h4>
                     <input type="number" min="0.0" max="1.0" step="0.1" id="opacitySelectorID">
                     <input type="button" id="changeOpacityButton" value="Confirm Opacity" />
                 </p>
-              </div>
-            </div>
+                <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
+                  <div id='googleMapDiv' style="width:800px;height:600px;">
 
-            <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
-              <div id='googleMapDiv' style="width:800px;height:600px;">
-
+                  </div>
+                </div>
               </div>
-            </div>
+
+          </div>
+
 
         </div>
 
@@ -156,7 +199,7 @@
     <h4>5. Run the scenario</h4>
     <h5>The result will show in the list below when it's finished</h5>
     <div class="row" align="center">
-        <button class="btn btn-default" style="width: 70%; margin-top: 15px;">
+        <button class="btn btn-default" style="width: 100%; margin-top: 15px;">
             Run Scenario
         </button>
     </div>
