@@ -70,7 +70,9 @@ var ScenarioList = React.createClass({
                         </a>
                     </td>
                     <td className="download-link">
-                        <a href="#">Show Hydrograph</a>
+                        <a href={'/api/scenarios/'+scenario._id.$oid}>
+                          View JSON
+                        </a>
                     </td>
                 </tr>
             );
@@ -87,7 +89,7 @@ var ScenarioList = React.createClass({
                             <td><strong>Total Fire Area (km<sup>2</sup>)</strong></td>
                             <td><strong>Download Inputs</strong></td>
                             <td><strong>Download Outputs</strong></td>
-                            <td className="download-link"><strong>View Hydrograph</strong></td>
+                            <td className="download-link"><strong>View JSON</strong></td>
                         </tr>
                     </thead>
                     <tbody>

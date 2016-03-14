@@ -1,9 +1,9 @@
 """
 Configuration for Flask Application 'NKN Metadata Editor'
 """
-
 import netCDF4
 import os
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 

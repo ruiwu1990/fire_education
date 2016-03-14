@@ -3,12 +3,12 @@ PRMS Fire Modeling API
 
 Date: Feb 25 2016
 """
-from datetime import datetime
-
 from flask import jsonify, request, Response
 from flask import current_app as app
 
+import math
 import json
+import datetime
 
 from . import api
 from ..models import Scenario, Hydrograph, Inputs, Outputs
@@ -72,10 +72,12 @@ def scenarios():
     """
     if request.method == 'GET':
 
-        try:
+        scenarios = Scenario.objects
+
+        if app.config['DEBUG'] and len(scenarios) == 0:
+            _init_dev_db(app.config['BASE_PARAMETER_NC'])
+
             scenarios = Scenario.objects
-        except:
-            scenarios = []
 
         return jsonify(scenarios=scenarios)
 
@@ -87,7 +89,7 @@ def scenarios():
 
         name = request.json['name']
 
-        time_received = datetime.now()
+        time_received = datetime.datetime.now()
 
         updated_parameter_nc = propagate_all_vegetation_changes(
             BASE_PARAMETER_NC, veg_map_by_hru
@@ -96,7 +98,7 @@ def scenarios():
         updated_veg_map_by_hru = get_veg_map_by_hru(updated_parameter_nc)
 
         # TODO placeholder
-        time_finished = datetime.now()
+        time_finished = datetime.datetime.now()
 
         # TODO placeholder
         inputs = Inputs()
@@ -106,8 +108,10 @@ def scenarios():
 
         # TODO placeholder
         hydrograph = Hydrograph(
-            time_array=[datetime(2010, 10, 1, 0), datetime(2010, 10, 1, 1),
-                        datetime(2010, 10, 1, 2), datetime(2010, 10, 1, 3)],
+            time_array=[datetime.datetime(2010, 10, 1, 0),
+                        datetime.datetime(2010, 10, 1, 1),
+                        datetime.datetime(2010, 10, 1, 2),
+                        datetime.datetime(2010, 10, 1, 3)],
             streamflow_array=[24.4, 34.6, 10.0, 86.0]
         )
 
@@ -136,3 +140,45 @@ def hru_veg_json():
         return jsonify(
             get_veg_map_by_hru(BASE_PARAMETER_NC)
         )
+
+
+def _init_dev_db(BASE_PARAMETER_NC):
+    """
+
+    """
+    name = 'Demo development scenario'
+    time_received = datetime.datetime.now()
+
+    updated_veg_map_by_hru = get_veg_map_by_hru(BASE_PARAMETER_NC)
+
+    time_finished = datetime.datetime.now()
+
+    inputs = Inputs()
+
+    outputs = Outputs()
+
+    # create two water years of fake data starting from 1 Oct 2010
+    begin_date = datetime.datetime(2010, 10, 1, 0)
+    time_array = [begin_date + datetime.timedelta(days=x) for x in
+                  range(365*2)]
+
+    # use simple exponentials as the prototype data
+    x = range(365)
+    streamflow_array = [pow(math.e, -pow(((i - 200.0)/100.0), 2)) for i in x]
+
+    hydrograph = Hydrograph(
+        time_array=time_array,
+        streamflow_array=streamflow_array+streamflow_array
+    )
+
+    new_scenario = Scenario(
+        name=name,
+        time_received=time_received,
+        time_finished=time_finished,
+        veg_map_by_hru=updated_veg_map_by_hru,
+        inputs=inputs,
+        outputs=outputs,
+        hydrograph=hydrograph
+    )
+
+    new_scenario.save()
