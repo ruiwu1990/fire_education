@@ -223,10 +223,6 @@ $(document).ready(function(){
       changeOverlayOpacity();
     });
 
-    $("#hydrographVisButton").click(function(){
-      window.location.href = "/hydrograph_vis";
-    });
-
 
   });
 

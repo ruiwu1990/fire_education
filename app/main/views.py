@@ -10,12 +10,12 @@ def index():
 
     return render_template('index.html')
 
-@main.route('/hydrograph_vis')
-def hydrograph_visualization():
+@main.route('/hydrograph_vis/<scenario_id>')
+def hydrograph_visualization(scenario_id = ''):
     """
     This function is for hydrograph visualization
     """
 
-    return render_template('hydrograph_vis.html')
+    return render_template('hydrograph_vis.html', scenario_id = scenario_id)
 
 

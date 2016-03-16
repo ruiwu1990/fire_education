@@ -2,6 +2,8 @@ $(document).ready(function(){
 	var inputJson;
 	var chartData=[];
 
+	var scenarioID = $('#scenario_id').text();
+
 	// Load the Visualization API and the chart package.
 	google.charts.load('current', {'packages':['corechart']});
 	
@@ -9,14 +11,22 @@ $(document).ready(function(){
 
 	// get data from /api/scenarios
 	$.get('/api/scenarios', function(data){
-		inputJson = data;
+
+		// find the current json file
+		for(var i=0; i<data["scenarios"].length; i++)
+		{
+			if(data["scenarios"][0]['_id']['$oid'] == scenarioID)
+			{
+				inputJson = data["scenarios"][i];
+			}
+		}
 
 		// get data into an array
 		// each element is number
-		var dataArray = inputJson["scenarios"][0]["hydrograph"]['streamflow_array'];
+		var dataArray = inputJson["hydrograph"]['streamflow_array'];
 		// get timestamps into an array
 		// each element is obj, need to use timestampsArray[0]['$date'] to extract date data, the date is number
-		var timestampsArray = inputJson["scenarios"][0]["hydrograph"]['time_array'];
+		var timestampsArray = inputJson["hydrograph"]['time_array'];
 
 		// for most cases the data length should be the same with timestamps length
 		var tempArray;
