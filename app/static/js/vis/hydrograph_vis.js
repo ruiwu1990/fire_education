@@ -52,7 +52,7 @@ $(document).ready(function(){
 	function drawChart() {
 		var data = new google.visualization.DataTable();
 		data.addColumn('date','Time');
-		data.addColumn('number','Hydro');
+		data.addColumn('number','Streamflow (cfs)');
 
 		data.addRows(chartData);
 
