@@ -26,7 +26,7 @@ $(document).ready(function(){
 			for(var i=0; i<dataArray.length; i++)
 			{
 				// tow columns for the current version, time and data
-				tempArray = [timestampsArray[i]['$date'],dataArray[i]];
+				tempArray = [new Date(timestampsArray[i]['$date']),dataArray[i]];
 				chartData.push(tempArray);
 			}
 		}
@@ -41,7 +41,7 @@ $(document).ready(function(){
 
 	function drawChart() {
 		var data = new google.visualization.DataTable();
-		data.addColumn('number','Time');
+		data.addColumn('date','Time');
 		data.addColumn('number','Hydro');
 
 		data.addRows(chartData);
