@@ -51,8 +51,24 @@ var ScenarioListBox = React.createClass({
  */
 var ScenarioList = React.createClass({
 
+    // this is used to open hydrograph in a new window
+    // displayHydrograph: function(tempScenario) {
+    //     var hydrographURL = '/hydrograph_vis/'+tempScenario._id.$oid;
+    //     window.open(hydrographURL, 'newwindow', 'width=548,height=325');
+    // },
+
+    // <a href="#"  onClick={this.displayHydrograph(scenario)}>
+    //<a href="#"  onClick={function(){var hydrographURL = '/hydrograph_vis/'+scenario._id.$oid; window.open(hydrographURL, 'newwindow', 'width=1000,height=700');}}>
+
     render: function() {
+
+        var displayHydrograph = function(tempScenario) {
+            var hydrographURL = '/hydrograph_vis/'+tempScenario._id.$oid;
+            window.open(hydrographURL, 'newwindow', 'width=900,height=700');
+        }
+
         var tableRows = this.props.data.scenarios.map(function(scenario) {
+
             return (
                 <tr key={scenario._id.$oid}>
                     <td>{scenario.name}</td>
@@ -70,8 +86,8 @@ var ScenarioList = React.createClass({
                         </a>
                     </td>
                     <td className="download-link">
-                        <a href={'/api/scenarios/'+scenario._id.$oid}>
-                          View JSON
+                        <a href="#"  onClick={displayHydrograph.bind(this,scenario)}>
+                          View Hydrograph
                         </a>
                     </td>
                 </tr>
@@ -89,7 +105,7 @@ var ScenarioList = React.createClass({
                             <td><strong>Total Fire Area (km<sup>2</sup>)</strong></td>
                             <td><strong>Download Inputs</strong></td>
                             <td><strong>Download Outputs</strong></td>
-                            <td className="download-link"><strong>View JSON</strong></td>
+                            <td className="download-link"><strong>View Hydrograph</strong></td>
                         </tr>
                     </thead>
                     <tbody>
