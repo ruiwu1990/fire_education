@@ -58,9 +58,14 @@ var ScenarioList = React.createClass({
     // },
 
     // <a href="#"  onClick={this.displayHydrograph(scenario)}>
+    //<a href="#"  onClick={function(){var hydrographURL = '/hydrograph_vis/'+scenario._id.$oid; window.open(hydrographURL, 'newwindow', 'width=1000,height=700');}}>
 
     render: function() {
 
+        var displayHydrograph = function(tempScenario) {
+            var hydrographURL = '/hydrograph_vis/'+tempScenario._id.$oid;
+            window.open(hydrographURL, 'newwindow', 'width=900,height=700');
+        }
 
         var tableRows = this.props.data.scenarios.map(function(scenario) {
 
@@ -81,7 +86,7 @@ var ScenarioList = React.createClass({
                         </a>
                     </td>
                     <td className="download-link">
-                        <a href="#"  onClick={function(){var hydrographURL = '/hydrograph_vis/'+scenario._id.$oid; window.open(hydrographURL, 'newwindow', 'width=1000,height=700');}}>
+                        <a href="#"  onClick={displayHydrograph.bind(this,scenario)}>
                           View Hydrograph
                         </a>
                     </td>
