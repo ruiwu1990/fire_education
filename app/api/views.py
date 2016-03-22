@@ -74,10 +74,14 @@ def scenarios():
 
         scenarios = Scenario.objects
 
-        if app.config['DEBUG'] and len(scenarios) == 0:
-            _init_dev_db(app.config['BASE_PARAMETER_NC'])
+        # this is for the first three scenarios only
+        if app.config['DEBUG'] and len(scenarios) < 3:
+            #_init_dev_db(app.config['BASE_PARAMETER_NC'])
+            for loop_counter in range(3):
+                _init_dev_db(app.config['BASE_PARAMETER_NC'],loop_counter)
 
-            scenarios = Scenario.objects
+                scenarios = Scenario.objects
+
 
         return jsonify(scenarios=scenarios)
 
@@ -142,11 +146,12 @@ def hru_veg_json():
         )
 
 
-def _init_dev_db(BASE_PARAMETER_NC):
+#def _init_dev_db(BASE_PARAMETER_NC):
+def _init_dev_db(BASE_PARAMETER_NC, scenario_num=0):
     """
 
     """
-    name = 'Demo development scenario'
+    name = 'Demo development scenario' + str(scenario_num)
     time_received = datetime.datetime.now()
 
     updated_veg_map_by_hru = get_veg_map_by_hru(BASE_PARAMETER_NC)
@@ -164,7 +169,7 @@ def _init_dev_db(BASE_PARAMETER_NC):
 
     # use simple exponentials as the prototype data
     x = range(365)
-    streamflow_array = [pow(math.e, -pow(((i - 200.0)/100.0), 2)) for i in x]
+    streamflow_array = [pow(math.e, -pow(((i - 200.0 + 50*scenario_num)/100.0), 2)) for i in x]
 
     hydrograph = Hydrograph(
         time_array=time_array,
