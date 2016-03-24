@@ -86,7 +86,7 @@ var ScenarioList = React.createClass({
                         </a>
                     </td>
                     <td className="download-link">
-                        <a href="#"  onClick={displayHydrograph.bind(this,scenario)}>
+                        <a onClick={displayHydrograph.bind(this,scenario)}>
                           View Hydrograph
                         </a>
                     </td>

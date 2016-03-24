@@ -15,7 +15,7 @@ $(document).ready(function(){
 		// find the current json file
 		for(var i=0; i<data["scenarios"].length; i++)
 		{
-			if(data["scenarios"][0]['_id']['$oid'] == scenarioID)
+			if(data["scenarios"][i]['_id']['$oid'] == scenarioID)
 			{
 				inputJson = data["scenarios"][i];
 			}
