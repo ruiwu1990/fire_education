@@ -63,11 +63,10 @@ var ScenarioList = React.createClass({
             return (
                 <tr key={scenario._id.$oid}>
                     <td>{scenario.name}</td>
-                    <td>{scenario.time_received.$date}</td>
-                    <td>{scenario.time_finished.$date}</td>
-                    <td style={{textAlign: 'center'}}>{scenario['total_fire_area(km^2)']}</td>
+                    <td>{new Date(scenario.time_received.$date).toISOString().slice(0,19)}</td>
+                    <td>{new Date(scenario.time_finished.$date).toISOString().slice(0,19)}</td>
                     <td>
-                    <a href={scenario.inputs ? scenario.inputs.parameter : '#'}>
+                        <a href={scenario.inputs ? scenario.inputs.parameter : '#'}>
                             Download Input Parameters
                         </a>
                     </td>
@@ -93,7 +92,6 @@ var ScenarioList = React.createClass({
                             <td><strong>Scenario Name</strong></td>
                             <td><strong>Time Received</strong></td>
                             <td><strong>Time Finished</strong></td>
-                            <td><strong>Total Fire Area (km<sup>2</sup>)</strong></td>
                             <td><strong>Download Inputs</strong></td>
                             <td><strong>Download Outputs</strong></td>
                             <td className="download-link"><strong>View Hydrograph</strong></td>
@@ -138,44 +136,3 @@ $('#save-veg-update').click(function(e) {
 $('#veg-update-list').on('click', 'a.remove-veg-update', function(e) {
     $(e.toElement.parentElement).remove();
 });
-
-    //var formData = new FormData();
-    //var form = $('form').serializeArray();
-
-    //var modelrunUUID;
-    //for (var i = 0; i < form.length; i++)
-    //{
-        //if (form[i].name === 'modelrunUUID')
-        //{
-            //modelrunUUID = form[i].value;
-        //}
-        //formData.append(form[i].name, form[i].value);
-    //}
-
-    //formData.append('uploadedFile', $('#uploadedFile')[0].scenarios[0]);
-
-    //var uploadUrl = '/api/scenarios/' + modelrunUUID + '/scenarios';
-
-    //var values = $(this).serialize();
-    //$.ajax({
-        //method: 'post',
-        //url: uploadUrl,
-        //data: formData,
-        //processData: false,
-        //contentType: false
-    //})
-    //.done( function() {
-        //$('#upload-success-message').slideUp(function() {
-            //setTimeout(function() {
-                //$('#upload-success-message').slideDown();
-            //}, 4000)
-        //});
-    //})
-    //.fail(function() {
-        //$('#upload-fail-message').slideUp(function() {
-            //setTimeout(function() {
-                //$('#upload-fail-message').slideDown();
-            //}, 4000)
-        //});
-    //})
-//});

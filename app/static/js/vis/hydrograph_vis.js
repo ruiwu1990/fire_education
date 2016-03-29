@@ -48,7 +48,7 @@ $(document).ready(function(){
 				$("#tableItemID").append(
 					"<tr key="+tempID+">"+
 					"<td>"+tempName+"</td>"+
-					"<td>"+"<input type='checkbox' id='"+tempID+"' value='"+tempID+"'>"+tempName+"</td>"+
+					"<td>"+"<input type='checkbox' id='"+tempID+"' value='"+tempID+"'></td>"+
 					"</tr>"
 				);
 				isDrawHydro[i] = false;
