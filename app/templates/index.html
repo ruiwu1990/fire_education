@@ -9,7 +9,7 @@
     <script type="text/javascript" src='/static/bower_components/html2canvas/build/html2canvas.min.js' type='text/javascript'></script>
     <!-- THIS JS IS an AWESOME COLOR LIB -->
     <script type="text/javascript" src="/static/bower_components/chroma-js/chroma.min.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCKFsfiOd7U0PrJUtcEH5VM1BFGiWsP9vE&callback=initMap" async defer></script>
     <script type="text/javascript" src="/static/js/vis/overlay_google_map.js"></script>
     <!-- THIS JS IS USED FOR 2D map polygon -->
     <script type="text/javascript" src="/static/js/vis/draw_polygon_on_map.js"></script>
@@ -62,19 +62,19 @@
       display: inline-block;
     }
     span#bare-ground-square {
-      color: pink;  
+      color: #ffffff;  
     }
     span#grasses-square {
-      color: black;  
+      color: #bcc8b9;  
     }
     span#shrubs-square {
-      color: blue;  
+      color: #7c9378;  
     }
     span#trees-square {
-      color: red;  
+      color: #40613b;  
     }
     span#conifers-square {
-      color: green;  
+      color: #003300;  
     }
     
     input#map-toggle {
@@ -152,6 +152,14 @@
       </button>
 
       <div id="veg-update-list"></div>
+
+      <div id="setFire">
+        <h4>3. Set Fire</h4>
+        <p>click the button and then change into set fire mode</p>
+        <button class="btn btn-default" id="fireModeID" style="width: 65%"> <!--style="width: 40%">-->
+            Fire Model
+        </button>
+      </div>
 
 
       <div id="maps" class="row">

@@ -52,6 +52,23 @@ $(document).ready(function(){
   var firstPosition;
   var secondPosition;
 
+  // this part is for the fire simulation
+  // this record the fire border
+  var fireBorder = [];
+  // each element in this array should  be [cellNumber, vegType, burnTime]
+  var onfireCell = [];
+  // this array only records array cell num
+  var onfireCellNum = [];
+  // different veg should burn last different amount of time
+  // I used fake data here until chao find real one
+  var vegBurnTime = [0, 1, 2, 3, 4];
+  // different veg should have different fire pass time
+  // fire pass from one area to another
+  // e.g. gress is easier to pass fire to other areas
+  var vegTransformTime = [0, 1, 2, 3, 4];
+
+
+
 
   $.get('/api/base-veg-map', function(data){
     inputJson = data;
@@ -90,8 +107,10 @@ $(document).ready(function(){
     // this is for define color for the cells
     //var scaleSize = Object.size(inputJson['vegetation_map']);
     var scaleSize = 5;
-    colorScale = chroma.scale(['pink','black','blue','red','green']).colors(scaleSize);
-
+    //colorScale = chroma.scale(['pink','black','blue','red','green']).colors(scaleSize);
+    colorScale = chroma.scale(['white','#003300']).colors(scaleSize);
+    // add fire color to be the last element
+    colorScale.push('#FF0000');
     // this part is used to push data into canvas
     // and paint color
     resetCanvas(vegOrigin);
@@ -103,6 +122,8 @@ $(document).ready(function(){
         latLonInformation['xurcorner'],
         latLonInformation['yllcorner'],
         latLonInformation['yurcorner']);
+
+
 
     $("#myCanvas")
     .mousedown(function(evt){
@@ -167,6 +188,10 @@ $(document).ready(function(){
       chosenHRU = [];
       chosenArea = [];
 
+      fireBorder = [];
+      onfireCell = [];
+      onfireCellNum = [];
+  
       updateMapOverlay();
     });
 
@@ -185,6 +210,29 @@ $(document).ready(function(){
 
       // update map overlay
       updateMapOverlay();
+    });
+
+    $("#fireModeID").click(function(){
+
+      $.each(chosenAreaInfo, function(index1, value1) {
+        //var tempColor = value1.colorNum;
+        $.each(value1.chosenArea,function(index2,value2){
+
+          // cell num, veg type, burn time
+          onfireCell.push([value2, vegCurrent[value2], 0]);
+          onfireCellNum.push(value2);
+
+          // the last element is for fire color
+          vegCurrent[value2] = colorScale.length - 1;
+        });
+      });
+
+      resetCanvas(vegCurrent);
+
+      // update map overlay
+      updateMapOverlay();
+      // call startFire() every half second
+      setInterval(startFire(onfireCell), 500);
     });
 
     $("#submitChangetoServerButton").click(function(){
@@ -451,6 +499,159 @@ $(document).ready(function(){
         }
       }
     }
+  }
+
+  function startFire(onfireCell)
+  {
+    // var fireBorder = [];
+    // // each element in this array should  be [cellNumber, vegType, burnTime]
+    // var onfireCell = [];
+    // // different veg should burn last different amount of time
+    // // I used fake data here until chao find real one
+    // var vegBurnTime = [0, 1, 2, 3, 4];
+    // // different veg should have different fire pass time
+    // // fire pass from one area to another
+    // // e.g. gress is easier to pass fire to other areas
+    // var vegTransformTime = [0, 1, 2, 3, 4];
+
+    // spread fire
+    $.each(onfireCell,function(index, value){
+      spreadFire(value[0],dataX,dataY);
+    });
+
+    // record current situation
+    $.each(onfireCell,function(index, value){
+      vegCurrent[value[0]] = colorScale.length - 1;;
+    });
+
+
+
+    resetCanvas(vegCurrent);
+
+    // update map overlay
+    updateMapOverlay();
+
+
+    // $("#fireModeID").click(function(){
+
+    //   $.each(chosenAreaInfo, function(index1, value1) {
+    //     //var tempColor = value1.colorNum;
+    //     $.each(value1.chosenArea,function(index2,value2){
+    //       // the last element is for fire color
+    //       vegCurrent[value2] = colorScale.length - 1;
+
+    //       onfireCell.push(value2);
+    //     });
+    //   });
+
+    //   resetCanvas(vegCurrent);
+
+    //   // update map overlay
+    //   updateMapOverlay();
+    //   // call startFire() every half second
+    //   setInterval(startFire(), 500);
+    // });
+  }
+
+  function spreadFire(firePos, maxX, maxY)
+  {
+    // check if the around cell is on fire
+    // left top corner
+    var currentIndex;
+    if(firePos == 0)
+    {
+      // right
+      currentIndex = 1;
+      // if not in the on fire array
+      if(onfireCell.find(findFire) == null)
+      {
+        onfireCell.push([currentIndex, vegCurrent[currentIndex], 0]);
+      }
+      // right bot
+      currentIndex = 1 + maxX;
+      // if not in the on fire array
+      if(onfireCell.find(findFire) == null)
+      {
+        onfireCell.push([currentIndex, vegCurrent[currentIndex], 0]);
+      }
+      // down
+      currentIndex = 0 + maxX;
+      // if not in the on fire array
+      if(onfireCell.find(findFire) == null)
+      {
+        onfireCell.push([currentIndex, vegCurrent[currentIndex], 0]);
+      }      
+    }
+    else if(firePos == (maxX-1))
+    {
+      // down
+      currentIndex = firePos + maxX;
+      // if not in the on fire array
+      if(onfireCell.find(findFire) == null)
+      {
+        onfireCell.push([currentIndex, vegCurrent[currentIndex], 0]);
+      }
+      // down left
+      currentIndex = firePos + maxX - 1;
+      // if not in the on fire array
+      if(onfireCell.find(findFire) == null)
+      {
+        onfireCell.push([currentIndex, vegCurrent[currentIndex], 0]);
+      }
+      // left
+      currentIndex = firePos - 1;
+      // if not in the on fire array
+      if(onfireCell.find(findFire) == null)
+      {
+        onfireCell.push([currentIndex, vegCurrent[currentIndex], 0]);
+      }     
+    }
+    // first row, not corners
+    else if(firePos>0 && firePos<(maxX-1))
+    {
+     // right
+      currentIndex = firePos + 1;
+      // if not in the on fire array
+      if(onfireCell.find(findFire) == null)
+      {
+        onfireCell.push([currentIndex, vegCurrent[currentIndex], 0]);
+      }
+      // right bot
+      currentIndex = firePos + 1 + maxX;
+      // if not in the on fire array
+      if(onfireCell.find(findFire) == null)
+      {
+        onfireCell.push([currentIndex, vegCurrent[currentIndex], 0]);
+      }
+      // down
+      currentIndex = firePos + maxX;
+      // if not in the on fire array
+      if(onfireCell.find(findFire) == null)
+      {
+        onfireCell.push([currentIndex, vegCurrent[currentIndex], 0]);
+      }
+      // down left
+      currentIndex = firePos + maxX - 1;
+      // if not in the on fire array
+      if(onfireCell.find(findFire) == null)
+      {
+        onfireCell.push([currentIndex, vegCurrent[currentIndex], 0]);
+      }
+      // left
+      currentIndex = firePos - 1;
+      // if not in the on fire array
+      if(onfireCell.find(findFire) == null)
+      {
+        onfireCell.push([currentIndex, vegCurrent[currentIndex], 0]);
+      }
+
+    }
+
+    function findFire(cellNum)
+    {
+      return cellNum[0] == currentIndex;
+    }
+
   }
 
 
