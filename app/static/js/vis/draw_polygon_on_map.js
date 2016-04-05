@@ -232,7 +232,7 @@ $(document).ready(function(){
       // update map overlay
       updateMapOverlay();
       // call startFire() every half second
-      setInterval(startFire(onfireCell), 500);
+      setInterval(startFire, 500);
     });
 
     $("#submitChangetoServerButton").click(function(){
@@ -362,6 +362,28 @@ $(document).ready(function(){
         }
       }
       canvas2DContext.stroke();
+  }
+
+  // this function only reset fire place
+  function resetFireCanvas(inputOnfireCellNum)
+  {
+    // m is for y
+    // i is for x
+    var m;
+    var i;
+
+    $.each(inputOnfireCellNum,function(index, value){
+      m = Math.floor(value / dataX);
+      i = Math.floor(value % dataX);
+      // the last element is for fire color
+      canvas2DContext.fillStyle = colorScale[colorScale.length - 1];
+      //                          start x,     y,            width,    height
+      canvas2DContext.fillRect(cellWidth*i,cellHeight*m,cellWidth,cellHeight);
+      // draw lines to separate cell
+      canvas2DContext.rect(cellWidth*i,cellHeight*m,cellWidth,cellHeight);
+    });
+
+    canvas2DContext.stroke();
   }
 
   // this function requires top left and bot right points for the chosen area
@@ -501,7 +523,7 @@ $(document).ready(function(){
     }
   }
 
-  function startFire(onfireCell)
+  function startFire()
   {
     // var fireBorder = [];
     // // each element in this array should  be [cellNumber, vegType, burnTime]
@@ -515,144 +537,119 @@ $(document).ready(function(){
     // var vegTransformTime = [0, 1, 2, 3, 4];
 
     // spread fire
-    $.each(onfireCell,function(index, value){
-      spreadFire(value[0],dataX,dataY);
+    $.each(onfireCellNum,function(index, value){
+      spreadFire(value,dataX,dataY);
     });
 
-    // record current situation
-    $.each(onfireCell,function(index, value){
-      vegCurrent[value[0]] = colorScale.length - 1;;
-    });
-
-
-
-    resetCanvas(vegCurrent);
+    resetFireCanvas(onfireCellNum);
 
     // update map overlay
     updateMapOverlay();
-
-
-    // $("#fireModeID").click(function(){
-
-    //   $.each(chosenAreaInfo, function(index1, value1) {
-    //     //var tempColor = value1.colorNum;
-    //     $.each(value1.chosenArea,function(index2,value2){
-    //       // the last element is for fire color
-    //       vegCurrent[value2] = colorScale.length - 1;
-
-    //       onfireCell.push(value2);
-    //     });
-    //   });
-
-    //   resetCanvas(vegCurrent);
-
-    //   // update map overlay
-    //   updateMapOverlay();
-    //   // call startFire() every half second
-    //   setInterval(startFire(), 500);
-    // });
   }
 
   function spreadFire(firePos, maxX, maxY)
   {
-    // check if the around cell is on fire
-    // left top corner
-    var currentIndex;
     if(firePos == 0)
     {
       // right
-      currentIndex = 1;
-      // if not in the on fire array
-      if(onfireCell.find(findFire) == null)
-      {
-        onfireCell.push([currentIndex, vegCurrent[currentIndex], 0]);
-      }
+      fireRight(firePos);
       // right bot
-      currentIndex = 1 + maxX;
-      // if not in the on fire array
-      if(onfireCell.find(findFire) == null)
-      {
-        onfireCell.push([currentIndex, vegCurrent[currentIndex], 0]);
-      }
+      fireRightBot(firePos);
       // down
-      currentIndex = 0 + maxX;
-      // if not in the on fire array
-      if(onfireCell.find(findFire) == null)
-      {
-        onfireCell.push([currentIndex, vegCurrent[currentIndex], 0]);
-      }      
+      fireBot(firePos);     
     }
     else if(firePos == (maxX-1))
     {
       // down
-      currentIndex = firePos + maxX;
-      // if not in the on fire array
-      if(onfireCell.find(findFire) == null)
-      {
-        onfireCell.push([currentIndex, vegCurrent[currentIndex], 0]);
-      }
+      fireBot(firePos);
       // down left
-      currentIndex = firePos + maxX - 1;
-      // if not in the on fire array
-      if(onfireCell.find(findFire) == null)
-      {
-        onfireCell.push([currentIndex, vegCurrent[currentIndex], 0]);
-      }
+      fireBotLeft(firePos);
       // left
-      currentIndex = firePos - 1;
-      // if not in the on fire array
-      if(onfireCell.find(findFire) == null)
-      {
-        onfireCell.push([currentIndex, vegCurrent[currentIndex], 0]);
-      }     
+      fireLeft(firePos)
     }
     // first row, not corners
     else if(firePos>0 && firePos<(maxX-1))
     {
      // right
-      currentIndex = firePos + 1;
-      // if not in the on fire array
-      if(onfireCell.find(findFire) == null)
-      {
-        onfireCell.push([currentIndex, vegCurrent[currentIndex], 0]);
-      }
+      fireRight(firePos);
       // right bot
-      currentIndex = firePos + 1 + maxX;
-      // if not in the on fire array
-      if(onfireCell.find(findFire) == null)
-      {
-        onfireCell.push([currentIndex, vegCurrent[currentIndex], 0]);
-      }
+      fireRightBot(firePos);
       // down
-      currentIndex = firePos + maxX;
-      // if not in the on fire array
-      if(onfireCell.find(findFire) == null)
-      {
-        onfireCell.push([currentIndex, vegCurrent[currentIndex], 0]);
-      }
+      fireBot(firePos);
       // down left
-      currentIndex = firePos + maxX - 1;
-      // if not in the on fire array
-      if(onfireCell.find(findFire) == null)
-      {
-        onfireCell.push([currentIndex, vegCurrent[currentIndex], 0]);
-      }
+      fireLeftBot(firePos);
       // left
-      currentIndex = firePos - 1;
-      // if not in the on fire array
-      if(onfireCell.find(findFire) == null)
-      {
-        onfireCell.push([currentIndex, vegCurrent[currentIndex], 0]);
-      }
+      fireLeft(firePos);
 
     }
 
-    function findFire(cellNum)
+    function fireRight(inputIndex)
     {
-      return cellNum[0] == currentIndex;
+      // right
+      inputIndex = inputIndex + 1;
+      // if not in the on fire array
+      //if(!findFire(onfireCell,inputIndex))
+      if(onfireCellNum.indexOf(inputIndex)==-1)
+      {
+        onfireCellNum.push(inputIndex);
+        onfireCell.push([inputIndex, vegCurrent[inputIndex], 0]);
+        vegCurrent[inputIndex] = colorScale.length - 1;
+      }
+    }
+
+    function fireRightBot(inputIndex)
+    {
+      // right bot
+      inputIndex = inputIndex + maxX;
+      // if not in the on fire array
+      //if(!findFire(onfireCell,inputIndex))
+      if(onfireCellNum.indexOf(inputIndex)==-1)
+      {
+        onfireCellNum.push(inputIndex);
+        onfireCell.push([inputIndex, vegCurrent[inputIndex], 0]);
+        vegCurrent[inputIndex] = colorScale.length - 1;
+      } 
+    }
+
+    function fireBot(inputIndex)
+    {
+      inputIndex = inputIndex + maxX;
+      // if not in the on fire array
+      //if(!findFire(onfireCell,inputIndex))
+      if(onfireCellNum.indexOf(inputIndex)==-1)
+      {
+        onfireCellNum.push(inputIndex);
+        onfireCell.push([inputIndex, vegCurrent[inputIndex], 0]);
+        vegCurrent[inputIndex] = colorScale.length - 1;
+      }
+    }
+
+    function fireLeftBot(inputIndex)
+    {
+      inputIndex = firePos + maxX - 1;
+      // if not in the on fire array
+      //if(!findFire(onfireCell,inputIndex))
+      if(onfireCellNum.indexOf(inputIndex)==-1)
+      {
+        onfireCellNum.push(inputIndex);
+        onfireCell.push([inputIndex, vegCurrent[inputIndex], 0]);
+        vegCurrent[inputIndex] = colorScale.length - 1;
+      }
+    }
+
+    function fireLeft(inputIndex)
+    {
+      inputIndex = firePos - 1;
+      // if not in the on fire array
+      //if(!findFire(onfireCell,inputIndex))
+      if(onfireCellNum.indexOf(inputIndex)==-1)
+      {
+        onfireCellNum.push(inputIndex);
+        onfireCell.push([inputIndex, vegCurrent[inputIndex], 0]);
+        vegCurrent[inputIndex] = colorScale.length - 1;
+      }
     }
 
   }
-
 
 });
