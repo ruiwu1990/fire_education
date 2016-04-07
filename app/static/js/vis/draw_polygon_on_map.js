@@ -537,9 +537,15 @@ $(document).ready(function(){
     // var vegTransformTime = [0, 1, 2, 3, 4];
 
     // spread fire
-    $.each(onfireCellNum,function(index, value){
+    // $.each can cause some bugs, it never goes out loop 
+    // $.each(onfireCellNum,function(index, value){
+    //   spreadFire(value,dataX,dataY);
+    // });
+    for(var i=0; i<onfireCellNum.length; i++)
+    {
       spreadFire(value,dataX,dataY);
-    });
+    }
+
 
     resetFireCanvas(onfireCellNum);
 
@@ -587,9 +593,15 @@ $(document).ready(function(){
     {
       // right
       inputIndex = inputIndex + 1;
+      // the element is added by the element in this range
+      // [currentPos-8,currentPos+8]
+      // also the boundary should not go outside the array range
+      var upper = Math.max(inputIndex+8,onfireCellNum.length);
+      var lower = Math.min(inputIndex-8,0);
+      var possibleArray = onfireCellNum.slice(lower,upper);
       // if not in the on fire array
-      //if(!findFire(onfireCell,inputIndex))
-      if(onfireCellNum.indexOf(inputIndex)==-1)
+      //if(onfireCellNum.indexOf(inputIndex)==-1)
+      if(possibleArray.indexOf(inputIndex)==-1)
       {
         onfireCellNum.push(inputIndex);
         onfireCell.push([inputIndex, vegCurrent[inputIndex], 0]);
@@ -601,9 +613,15 @@ $(document).ready(function(){
     {
       // right bot
       inputIndex = inputIndex + maxX;
+      // the element is added by the element in this range
+      // [currentPos-8,currentPos+8]
+      // also the boundary should not go outside the array range
+      var upper = Math.max(inputIndex+8,onfireCellNum.length);
+      var lower = Math.min(inputIndex-8,0);
+      var possibleArray = onfireCellNum.slice(lower,upper);
       // if not in the on fire array
-      //if(!findFire(onfireCell,inputIndex))
-      if(onfireCellNum.indexOf(inputIndex)==-1)
+      //if(onfireCellNum.indexOf(inputIndex)==-1)
+      if(possibleArray.indexOf(inputIndex)==-1)
       {
         onfireCellNum.push(inputIndex);
         onfireCell.push([inputIndex, vegCurrent[inputIndex], 0]);
@@ -614,9 +632,15 @@ $(document).ready(function(){
     function fireBot(inputIndex)
     {
       inputIndex = inputIndex + maxX;
+      // the element is added by the element in this range
+      // [currentPos-8,currentPos+8]
+      // also the boundary should not go outside the array range
+      var upper = Math.max(inputIndex+8,onfireCellNum.length);
+      var lower = Math.min(inputIndex-8,0);
+      var possibleArray = onfireCellNum.slice(lower,upper);
       // if not in the on fire array
-      //if(!findFire(onfireCell,inputIndex))
-      if(onfireCellNum.indexOf(inputIndex)==-1)
+      //if(onfireCellNum.indexOf(inputIndex)==-1)
+      if(possibleArray.indexOf(inputIndex)==-1)
       {
         onfireCellNum.push(inputIndex);
         onfireCell.push([inputIndex, vegCurrent[inputIndex], 0]);
@@ -627,9 +651,15 @@ $(document).ready(function(){
     function fireLeftBot(inputIndex)
     {
       inputIndex = firePos + maxX - 1;
+      // the element is added by the element in this range
+      // [currentPos-8,currentPos+8]
+      // also the boundary should not go outside the array range
+      var upper = Math.max(inputIndex+8,onfireCellNum.length);
+      var lower = Math.min(inputIndex-8,0);
+      var possibleArray = onfireCellNum.slice(lower,upper);
       // if not in the on fire array
-      //if(!findFire(onfireCell,inputIndex))
-      if(onfireCellNum.indexOf(inputIndex)==-1)
+      //if(onfireCellNum.indexOf(inputIndex)==-1)
+      if(possibleArray.indexOf(inputIndex)==-1)
       {
         onfireCellNum.push(inputIndex);
         onfireCell.push([inputIndex, vegCurrent[inputIndex], 0]);
@@ -640,9 +670,15 @@ $(document).ready(function(){
     function fireLeft(inputIndex)
     {
       inputIndex = firePos - 1;
+      // the element is added by the element in this range
+      // [currentPos-8,currentPos+8]
+      // also the boundary should not go outside the array range
+      var upper = Math.max(inputIndex+8,onfireCellNum.length);
+      var lower = Math.min(inputIndex-8,0);
+      var possibleArray = onfireCellNum.slice(lower,upper);
       // if not in the on fire array
-      //if(!findFire(onfireCell,inputIndex))
-      if(onfireCellNum.indexOf(inputIndex)==-1)
+      //if(onfireCellNum.indexOf(inputIndex)==-1)
+      if(possibleArray.indexOf(inputIndex)==-1)
       {
         onfireCellNum.push(inputIndex);
         onfireCell.push([inputIndex, vegCurrent[inputIndex], 0]);
