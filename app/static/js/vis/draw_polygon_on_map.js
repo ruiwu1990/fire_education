@@ -55,17 +55,27 @@ $(document).ready(function(){
   // this part is for the fire simulation
   // this record the fire border
   var fireBorder = [];
-  // each element in this array should  be [cellNumber, vegType, burnTime]
+  // each element in this array should  be [cellNumber, vegType, burnTime, r]
+  // r = vegTransferRateCurrent*wind/cos(slope)
+  // if r >= 1  then spread fire, if r <= 0, r = 0
+  // r contains 8 elements, because the basic 8 fire grid system
   var onfireCell = [];
   // this array only records array cell num
   var onfireCellNum = [];
   // different veg should burn last different amount of time
   // I used fake data here until chao find real one
   var vegBurnTime = [0, 1, 2, 3, 4];
-  // different veg should have different fire pass time
+  // different veg should have different fire pass rate
   // fire pass from one area to another
   // e.g. gress is easier to pass fire to other areas
-  var vegTransformTime = [0, 1, 2, 3, 4];
+  // scale down from paper data: 0, 3955, 70, 2533
+  // no data for conifers, use the same as trees
+  var vegTransferRate = [0, 1, 0.0182, 0.6405, 0.6405];
+  // the eight elements should be between 0 and 1
+  // the eight elements are 
+  // west, west-north, north, north-east,
+  // east, east-south, south, south-west
+  var wind = [1,1,1,1,1,1,1,1];
 
 
 
@@ -206,6 +216,8 @@ $(document).ready(function(){
         });
       });
 
+      chosenAreaInfo = [];
+
       resetCanvas(vegCurrent);
 
       // update map overlay
@@ -214,16 +226,21 @@ $(document).ready(function(){
 
     $("#fireModeID").click(function(){
 
+
       $.each(chosenAreaInfo, function(index1, value1) {
         //var tempColor = value1.colorNum;
         $.each(value1.chosenArea,function(index2,value2){
+          // this if prevent duplicate elements to be pushed
+          if($.inArray(value2, onfireCellNum) === -1)
+          {
+            // cell num, veg type, burn time
+            onfireCell.push([value2, vegCurrent[value2], 0, [0,0,0,0,0,0,0,0]]);
+            onfireCellNum.push(value2);
 
-          // cell num, veg type, burn time
-          onfireCell.push([value2, vegCurrent[value2], 0]);
-          onfireCellNum.push(value2);
-
-          // the last element is for fire color
-          vegCurrent[value2] = colorScale.length - 1;
+            // the last element is for fire color
+            vegCurrent[value2] = colorScale.length - 1;  
+          }
+          
         });
       });
 
@@ -375,8 +392,17 @@ $(document).ready(function(){
     $.each(inputOnfireCellNum,function(index, value){
       m = Math.floor(value / dataX);
       i = Math.floor(value % dataX);
-      // the last element is for fire color
-      canvas2DContext.fillStyle = colorScale[colorScale.length - 1];
+      // not bare ground
+      if(onfireCell[index][1] != 0)
+      {
+        // the last element is for fire color
+        canvas2DContext.fillStyle = colorScale[colorScale.length - 1];
+      }
+      // bare ground
+      else
+      {
+        canvas2DContext.fillStyle = colorScale[0];
+      }
       //                          start x,     y,            width,    height
       canvas2DContext.fillRect(cellWidth*i,cellHeight*m,cellWidth,cellHeight);
       // draw lines to separate cell
@@ -525,165 +551,329 @@ $(document).ready(function(){
 
   function startFire()
   {
-    // var fireBorder = [];
-    // // each element in this array should  be [cellNumber, vegType, burnTime]
-    // var onfireCell = [];
-    // // different veg should burn last different amount of time
-    // // I used fake data here until chao find real one
-    // var vegBurnTime = [0, 1, 2, 3, 4];
-    // // different veg should have different fire pass time
-    // // fire pass from one area to another
-    // // e.g. gress is easier to pass fire to other areas
-    // var vegTransformTime = [0, 1, 2, 3, 4];
 
     // spread fire
-    // $.each can cause some bugs, it never goes out loop 
-    // $.each(onfireCellNum,function(index, value){
-    //   spreadFire(value,dataX,dataY);
-    // });
-    for(var i=0; i<onfireCellNum.length; i++)
-    {
-      spreadFire(value,dataX,dataY);
-    }
+    // parallel.js should go here!!!!!!!!!!!!!
+    $.each(onfireCellNum,function(index, value){
 
+      spreadFire(value,dataX,dataY,index);
 
+      var burnMaxtime = vegBurnTime[onfireCell[index][1]];
+      // if not bare ground, the cell can burn
+      if(onfireCell[index][1] != 0)
+      {
+        if(onfireCell[index][2] <= burnMaxtime)
+        {
+          onfireCell[index][2] = onfireCell[index][2] + 1;
+        }
+        else
+        {
+          // change it into bare ground if cell is burn out
+          onfireCell[index][1] = 0;
+        }
+      }
+    });
+      
     resetFireCanvas(onfireCellNum);
 
     // update map overlay
     updateMapOverlay();
   }
 
-  function spreadFire(firePos, maxX, maxY)
+  function spreadFire(firePos, maxX, maxY,fireCellIndex)
   {
-    if(firePos == 0)
+    // only is current cell is not bare ground
+    // the fire will spread
+    if(onfireCell[fireCellIndex][1] != 0)
     {
-      // right
-      fireRight(firePos);
-      // right bot
-      fireRightBot(firePos);
-      // down
-      fireBot(firePos);     
-    }
-    else if(firePos == (maxX-1))
-    {
-      // down
-      fireBot(firePos);
-      // down left
-      fireBotLeft(firePos);
-      // left
-      fireLeft(firePos)
-    }
-    // first row, not corners
-    else if(firePos>0 && firePos<(maxX-1))
-    {
-     // right
-      fireRight(firePos);
-      // right bot
-      fireRightBot(firePos);
-      // down
-      fireBot(firePos);
-      // down left
-      fireLeftBot(firePos);
-      // left
-      fireLeft(firePos);
-
-    }
-
-    function fireRight(inputIndex)
-    {
-      // right
-      inputIndex = inputIndex + 1;
-      // the element is added by the element in this range
-      // [currentPos-8,currentPos+8]
-      // also the boundary should not go outside the array range
-      var upper = Math.max(inputIndex+8,onfireCellNum.length);
-      var lower = Math.min(inputIndex-8,0);
-      var possibleArray = onfireCellNum.slice(lower,upper);
-      // if not in the on fire array
-      //if(onfireCellNum.indexOf(inputIndex)==-1)
-      if(possibleArray.indexOf(inputIndex)==-1)
+      
+      if(firePos == 0)
       {
-        onfireCellNum.push(inputIndex);
-        onfireCell.push([inputIndex, vegCurrent[inputIndex], 0]);
-        vegCurrent[inputIndex] = colorScale.length - 1;
+        // right
+        fireRight(firePos,fireCellIndex);
+        // right bot
+        fireRightBot(firePos,fireCellIndex);
+        // down
+        fireBot(firePos,fireCellIndex);     
+      }
+      else if(firePos == (maxX-1))
+      {
+        // down
+        fireBot(firePos,fireCellIndex);
+        // down left
+        fireLeftBot(firePos,fireCellIndex);
+        // left
+        fireLeft(firePos,fireCellIndex);
+      }
+      // first row, not corners
+      else if(firePos>0 && firePos<(maxX-1))
+      {
+       // right
+        fireRight(firePos,fireCellIndex);
+        // right bot
+        fireRightBot(firePos,fireCellIndex);
+        // down
+        fireBot(firePos,fireCellIndex);
+        // down left
+        fireLeftBot(firePos,fireCellIndex);
+        // left
+        fireLeft(firePos,fireCellIndex);
+      }
+      // left most column and not top left corner and not bot left corner
+      else if(firePos%maxX==0 && Math.floor(firePos/maxX)!=(maxY-1) && firePos!=0)
+      {
+        fireTop(firePos,fireCellIndex);
+        fireBot(firePos,fireCellIndex);
+        fireRightBot(firePos,fireCellIndex);
+        fireRight(firePos,fireCellIndex);
+        fireRightTop(firePos,fireCellIndex);
+      }
+      // bot left corner
+      else if(firePos%maxX==0 && Math.floor(firePos/maxX)==(maxY-1))
+      {
+        fireTop(firePos,fireCellIndex);
+        fireRight(firePos,fireCellIndex);
+        fireRightTop(firePos,fireCellIndex);
+      }
+      // bot right corner
+      else if((firePos+1)%maxX==0 && ((firePos+1)/maxX)==maxY)
+      {
+        fireTop(firePos,fireCellIndex);
+        fireLeft(firePos,fireCellIndex);
+        fireLeftTop(firePos,fireCellIndex);
+      }
+      // right most column and not top right corner and not bot right corner
+      else if((firePos+1)%maxX==0 && ((firePos+1)/maxX)!=maxY && firePos!=(maxX-1))
+      {
+        fireTop(firePos,fireCellIndex);
+        fireBot(firePos,fireCellIndex);
+        fireLeft(firePos,fireCellIndex);
+        fireLeftBot(firePos,fireCellIndex);
+        fireLeftTop(firePos,fireCellIndex);
+      }
+      // last row, not corners
+      else if(firePos%maxX!=0 && Math.floor(firePos/maxX)==(maxY-1) && (firePos+1)%maxX!=0)
+      {
+        fireRight(firePos,fireCellIndex);
+        fireRightTop(firePos,fireCellIndex);
+        fireLeftTop(firePos,fireCellIndex);
+        fireLeft(firePos,fireCellIndex);
+        fireTop(firePos,fireCellIndex);
+      }
+      // not at the border line
+      else if(firePos%maxX!=0 && Math.floor(firePos/maxX)<(maxY-1) && Math.floor(firePos/maxX)>0 && (firePos+1)%maxX!=0)
+      {
+        fireTop(firePos,fireCellIndex);
+        fireBot(firePos,fireCellIndex);
+        fireLeft(firePos,fireCellIndex);
+        fireRight(firePos,fireCellIndex);
+        fireLeftBot(firePos,fireCellIndex);
+        fireLeftTop(firePos,fireCellIndex);
+        fireRightBot(firePos,fireCellIndex);
+        fireRightTop(firePos,fireCellIndex);
       }
     }
 
-    function fireRightBot(inputIndex)
+    function updateFireArray(tempIndex)
     {
-      // right bot
-      inputIndex = inputIndex + maxX;
-      // the element is added by the element in this range
-      // [currentPos-8,currentPos+8]
-      // also the boundary should not go outside the array range
-      var upper = Math.max(inputIndex+8,onfireCellNum.length);
-      var lower = Math.min(inputIndex-8,0);
-      var possibleArray = onfireCellNum.slice(lower,upper);
-      // if not in the on fire array
-      //if(onfireCellNum.indexOf(inputIndex)==-1)
-      if(possibleArray.indexOf(inputIndex)==-1)
+
+      var elementPos = onfireCellNum.indexOf(tempIndex);
+      // not in array and not bare ground
+      if(elementPos==-1)
       {
-        onfireCellNum.push(inputIndex);
-        onfireCell.push([inputIndex, vegCurrent[inputIndex], 0]);
-        vegCurrent[inputIndex] = colorScale.length - 1;
-      } 
+        onfireCellNum.push(tempIndex);
+        onfireCell.push([tempIndex, vegCurrent[tempIndex], 0, [0,0,0,0,0,0,0,0]]);
+        //vegCurrent[tempIndex] = colorScale.length - 1;
+      }
+      // if in the on fire array and not bare ground
+      // update burning time
+      // else if(elementPos!=-1 && onfireCell[elementPos][1]!=0)
+      // {
+      //   var burnMaxtime = vegBurnTime[onfireCell[elementPos][1]];
+      //   if(onfireCell[elementPos][2] <= burnMaxtime)
+      //   {
+      //     onfireCell[elementPos][2] = onfireCell[elementPos][2] + 1;
+      //   }
+      //   else
+      //   {
+      //     // change it into bare ground if cell is burn out
+      //     onfireCell[elementPos][1] = 0;
+      //   }
+      // }
+    }
+    // right top, left top, left bot, and right bot have longer recLong
+    function getCos(centerCellIndex,aimCellIndex,isLonger)
+    {
+      var deltaHeight  = Math.abs(elevationInfo[centerCellIndex]-elevationInfo[centerCellIndex]);
+      if(!isLonger)
+      {
+        // 10000 is 100*100, 100 is grid length
+        var recLong = Math.sqrt(10000+(deltaHeight*deltaHeight));
+        return 100/recLong;
+      }
+      else
+      {
+        // sqrt(20000) is grid length
+        var recLong = Math.sqrt(20000+(deltaHeight*deltaHeight));
+        return Math.sqrt(20000)/recLong;
+      }
+      
     }
 
-    function fireBot(inputIndex)
+    function fireTop(inputIndex,inputFireCellIndex)
     {
-      inputIndex = inputIndex + maxX;
-      // the element is added by the element in this range
-      // [currentPos-8,currentPos+8]
-      // also the boundary should not go outside the array range
-      var upper = Math.max(inputIndex+8,onfireCellNum.length);
-      var lower = Math.min(inputIndex-8,0);
-      var possibleArray = onfireCellNum.slice(lower,upper);
-      // if not in the on fire array
-      //if(onfireCellNum.indexOf(inputIndex)==-1)
-      if(possibleArray.indexOf(inputIndex)==-1)
+      var longer = false;
+      var cosValue = getCos(inputIndex,(inputIndex-maxX),longer);
+      var rveg = vegTransferRate[onfireCell[inputFireCellIndex][1]]/cosValue;
+      onfireCell[inputFireCellIndex][3][1] += rveg;
+      if(onfireCell[inputFireCellIndex][3][1] >= 1)
       {
-        onfireCellNum.push(inputIndex);
-        onfireCell.push([inputIndex, vegCurrent[inputIndex], 0]);
-        vegCurrent[inputIndex] = colorScale.length - 1;
+        inputIndex = inputIndex - maxX;
+  
+        updateFireArray(inputIndex);
       }
+      else if(onfireCell[inputFireCellIndex][3][1] <= 0)
+      {
+        onfireCell[inputFireCellIndex][3][1] = 0;
+      }
+
     }
 
-    function fireLeftBot(inputIndex)
+    function fireRightTop(inputIndex,inputFireCellIndex)
     {
-      inputIndex = firePos + maxX - 1;
-      // the element is added by the element in this range
-      // [currentPos-8,currentPos+8]
-      // also the boundary should not go outside the array range
-      var upper = Math.max(inputIndex+8,onfireCellNum.length);
-      var lower = Math.min(inputIndex-8,0);
-      var possibleArray = onfireCellNum.slice(lower,upper);
-      // if not in the on fire array
-      //if(onfireCellNum.indexOf(inputIndex)==-1)
-      if(possibleArray.indexOf(inputIndex)==-1)
+      var longer = true;
+      var cosValue = getCos(inputIndex,(inputIndex - maxX + 1),longer);
+      var rveg = vegTransferRate[onfireCell[inputFireCellIndex][1]]/cosValue;
+      onfireCell[inputFireCellIndex][3][2] += rveg;
+      if(onfireCell[inputFireCellIndex][3][2] >= 1)
       {
-        onfireCellNum.push(inputIndex);
-        onfireCell.push([inputIndex, vegCurrent[inputIndex], 0]);
-        vegCurrent[inputIndex] = colorScale.length - 1;
+        inputIndex = inputIndex - maxX + 1;
+
+        updateFireArray(inputIndex);
       }
+      else if(onfireCell[inputFireCellIndex][3][2] <= 0)
+      {
+        onfireCell[inputFireCellIndex][3][2] = 0;
+      }      
+
     }
 
-    function fireLeft(inputIndex)
+    function fireRight(inputIndex,inputFireCellIndex)
     {
-      inputIndex = firePos - 1;
-      // the element is added by the element in this range
-      // [currentPos-8,currentPos+8]
-      // also the boundary should not go outside the array range
-      var upper = Math.max(inputIndex+8,onfireCellNum.length);
-      var lower = Math.min(inputIndex-8,0);
-      var possibleArray = onfireCellNum.slice(lower,upper);
-      // if not in the on fire array
-      //if(onfireCellNum.indexOf(inputIndex)==-1)
-      if(possibleArray.indexOf(inputIndex)==-1)
+      var longer = false;
+      var cosValue = getCos(inputIndex,(inputIndex + 1),longer);
+      var rveg = vegTransferRate[onfireCell[inputFireCellIndex][1]]/cosValue;
+      onfireCell[inputFireCellIndex][3][4] += rveg;
+      if(onfireCell[inputFireCellIndex][3][4] >= 1)
       {
-        onfireCellNum.push(inputIndex);
-        onfireCell.push([inputIndex, vegCurrent[inputIndex], 0]);
-        vegCurrent[inputIndex] = colorScale.length - 1;
+        // right
+        inputIndex = inputIndex + 1;
+
+        updateFireArray(inputIndex);
       }
+      else if(onfireCell[inputFireCellIndex][3][4] <= 0)
+      {
+        onfireCell[inputFireCellIndex][3][4] = 0;
+      }
+
+    }
+
+    function fireRightBot(inputIndex,inputFireCellIndex)
+    {
+      var longer = true;
+      var cosValue = getCos(inputIndex,(inputIndex + maxX),longer);
+      var rveg = vegTransferRate[onfireCell[inputFireCellIndex][1]]/cosValue;
+      onfireCell[inputFireCellIndex][3][7] += rveg;
+      if(onfireCell[inputFireCellIndex][3][7] >= 1)
+      {
+        inputIndex = inputIndex + maxX;
+
+        updateFireArray(inputIndex);
+      }
+      else if(onfireCell[inputFireCellIndex][3][7] <= 0)
+      {
+        onfireCell[inputFireCellIndex][3][7] = 0;
+      }      
+
+    }
+
+    function fireBot(inputIndex,inputFireCellIndex)
+    {
+      var longer = false;
+      var cosValue = getCos(inputIndex,(inputIndex + maxX),longer);
+      var rveg = vegTransferRate[onfireCell[inputFireCellIndex][1]]/cosValue;
+      onfireCell[inputFireCellIndex][3][6] += rveg;
+      if(onfireCell[inputFireCellIndex][3][6] >= 1)
+      {
+        inputIndex = inputIndex + maxX;
+
+        updateFireArray(inputIndex);
+      }
+      else if(onfireCell[inputFireCellIndex][3][6] <= 0)
+      {
+        onfireCell[inputFireCellIndex][3][6] = 0;
+      }
+
+    }
+
+    function fireLeftBot(inputIndex,inputFireCellIndex)
+    {
+      var longer = true;
+      var cosValue = getCos(inputIndex,(inputIndex + maxX - 1),longer);
+      var rveg = vegTransferRate[onfireCell[inputFireCellIndex][1]]/cosValue;
+      onfireCell[inputFireCellIndex][3][5] += rveg;
+      if(onfireCell[inputFireCellIndex][3][5] >= 1)
+      {
+        inputIndex = inputIndex + maxX - 1;
+
+        updateFireArray(inputIndex);
+      }
+      else if(onfireCell[inputFireCellIndex][3][5] <= 0)
+      {
+        onfireCell[inputFireCellIndex][3][5] = 0;
+      }
+
+
+    }
+
+    function fireLeftTop(inputIndex,inputFireCellIndex)
+    {
+      var longer = true;
+      var cosValue = getCos(inputIndex,(inputIndex - maxX - 1),longer);
+      var rveg = vegTransferRate[onfireCell[inputFireCellIndex][1]]/cosValue;
+      onfireCell[inputFireCellIndex][3][0] += rveg;
+      if(onfireCell[inputFireCellIndex][3][0] >= 1)
+      {
+        inputIndex = inputIndex - maxX - 1;
+
+        updateFireArray(inputIndex);
+      }
+      else if(onfireCell[inputFireCellIndex][3][0] <= 0)
+      {
+        onfireCell[inputFireCellIndex][3][0] = 0;
+      }
+
+    }
+
+
+    function fireLeft(inputIndex,inputFireCellIndex)
+    {
+      var longer = false;
+      var cosValue = getCos(inputIndex,(inputIndex - 1),longer);
+      var rveg = vegTransferRate[onfireCell[inputFireCellIndex][1]]/cosValue;
+      onfireCell[inputFireCellIndex][3][3] += rveg;
+      if(onfireCell[inputFireCellIndex][3][3] >= 1)
+      {
+        inputIndex = inputIndex - 1;
+
+        updateFireArray(inputIndex);
+      }
+      else if(onfireCell[inputFireCellIndex][3][3] <= 0)
+      {
+        onfireCell[inputFireCellIndex][3][3] = 0;
+      }
+
+
     }
 
   }
