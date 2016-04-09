@@ -73,9 +73,11 @@ $(document).ready(function(){
   var vegTransferRate = [0, 1, 0.0182, 0.6405, 0.6405];
   // the eight elements should be between 0 and 1
   // the eight elements are 
-  // west, west-north, north, north-east,
-  // east, east-south, south, south-west
-  var wind = [1,1,1,1,1,1,1,1];
+  // west-north, north, north-east, west,
+  // east, south-west, south, east-south
+  // all the elements should be between 0 and 2, en... just to control speed
+  // need more scientific wind model
+  var wind = [1,2,1,1,1,1,1,1];
 
 
 
@@ -724,7 +726,7 @@ $(document).ready(function(){
     {
       var longer = false;
       var cosValue = getCos(inputIndex,(inputIndex-maxX),longer);
-      var rveg = vegTransferRate[onfireCell[inputFireCellIndex][1]]/cosValue;
+      var rveg = wind[1]*vegTransferRate[onfireCell[inputFireCellIndex][1]]/cosValue;
       onfireCell[inputFireCellIndex][3][1] += rveg;
       if(onfireCell[inputFireCellIndex][3][1] >= 1)
       {
@@ -743,7 +745,7 @@ $(document).ready(function(){
     {
       var longer = true;
       var cosValue = getCos(inputIndex,(inputIndex - maxX + 1),longer);
-      var rveg = vegTransferRate[onfireCell[inputFireCellIndex][1]]/cosValue;
+      var rveg = wind[2]*vegTransferRate[onfireCell[inputFireCellIndex][1]]/cosValue;
       onfireCell[inputFireCellIndex][3][2] += rveg;
       if(onfireCell[inputFireCellIndex][3][2] >= 1)
       {
@@ -762,7 +764,7 @@ $(document).ready(function(){
     {
       var longer = false;
       var cosValue = getCos(inputIndex,(inputIndex + 1),longer);
-      var rveg = vegTransferRate[onfireCell[inputFireCellIndex][1]]/cosValue;
+      var rveg = wind[4]*vegTransferRate[onfireCell[inputFireCellIndex][1]]/cosValue;
       onfireCell[inputFireCellIndex][3][4] += rveg;
       if(onfireCell[inputFireCellIndex][3][4] >= 1)
       {
@@ -782,7 +784,7 @@ $(document).ready(function(){
     {
       var longer = true;
       var cosValue = getCos(inputIndex,(inputIndex + maxX),longer);
-      var rveg = vegTransferRate[onfireCell[inputFireCellIndex][1]]/cosValue;
+      var rveg = wind[7]*vegTransferRate[onfireCell[inputFireCellIndex][1]]/cosValue;
       onfireCell[inputFireCellIndex][3][7] += rveg;
       if(onfireCell[inputFireCellIndex][3][7] >= 1)
       {
@@ -801,7 +803,7 @@ $(document).ready(function(){
     {
       var longer = false;
       var cosValue = getCos(inputIndex,(inputIndex + maxX),longer);
-      var rveg = vegTransferRate[onfireCell[inputFireCellIndex][1]]/cosValue;
+      var rveg = wind[6]*vegTransferRate[onfireCell[inputFireCellIndex][1]]/cosValue;
       onfireCell[inputFireCellIndex][3][6] += rveg;
       if(onfireCell[inputFireCellIndex][3][6] >= 1)
       {
@@ -820,7 +822,7 @@ $(document).ready(function(){
     {
       var longer = true;
       var cosValue = getCos(inputIndex,(inputIndex + maxX - 1),longer);
-      var rveg = vegTransferRate[onfireCell[inputFireCellIndex][1]]/cosValue;
+      var rveg = wind[5]*vegTransferRate[onfireCell[inputFireCellIndex][1]]/cosValue;
       onfireCell[inputFireCellIndex][3][5] += rveg;
       if(onfireCell[inputFireCellIndex][3][5] >= 1)
       {
@@ -840,7 +842,7 @@ $(document).ready(function(){
     {
       var longer = true;
       var cosValue = getCos(inputIndex,(inputIndex - maxX - 1),longer);
-      var rveg = vegTransferRate[onfireCell[inputFireCellIndex][1]]/cosValue;
+      var rveg = wind[0]*vegTransferRate[onfireCell[inputFireCellIndex][1]]/cosValue;
       onfireCell[inputFireCellIndex][3][0] += rveg;
       if(onfireCell[inputFireCellIndex][3][0] >= 1)
       {
@@ -860,7 +862,7 @@ $(document).ready(function(){
     {
       var longer = false;
       var cosValue = getCos(inputIndex,(inputIndex - 1),longer);
-      var rveg = vegTransferRate[onfireCell[inputFireCellIndex][1]]/cosValue;
+      var rveg = wind[3]*vegTransferRate[onfireCell[inputFireCellIndex][1]]/cosValue;
       onfireCell[inputFireCellIndex][3][3] += rveg;
       if(onfireCell[inputFireCellIndex][3][3] >= 1)
       {
